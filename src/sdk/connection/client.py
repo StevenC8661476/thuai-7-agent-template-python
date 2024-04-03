@@ -48,7 +48,7 @@ class Client:
         while True:
             try:
                 json_string = await self._connection.recv()  # type: ignore
-                message = Message(json.loads(json_string))
+                message = Message(json_string)
 
                 handler_list = self.Message_handler_list.copy()
 
