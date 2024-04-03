@@ -5,7 +5,7 @@ from .connection import message
 
 from .logger import Logger
 
-from . import map, player, supplies
+from . import map, player, supplies, safezone
 
 class Agent:
     def __init__(self):
@@ -24,6 +24,7 @@ class Agent:
         self.PlayerInfo = None
         self.Map = None
         self.Supplies = None
+        self.SafeZone = None
 
     async def _initialize(self):
         '''
@@ -203,6 +204,13 @@ class Agent:
                         )
                     ) for supply in msg_dict["supplies"]
                 ]
+
+            elif msg_type == "SAFE_ZONE":
+                self.SafeZone = safezone.SafeZone(
+                    center_x = msg_dict["center"]["x"],
+                    center_y = msg_dict["center"]["y"],
+                    radius = msg_dict["radius"]
+                )
 
             else:
                 self._logger.warn(f"Unknown message type: {msg_type}")

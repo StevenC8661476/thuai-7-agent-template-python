@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from agent import map, player, supplies
+from agent import map, player, supplies, safezone
 from agent.agent import Agent
 from agent.logger import Logger
 
@@ -86,3 +86,9 @@ class AgentEntry(Agent):
         Get the supplies info.
         '''
         return self.Supplies
+
+    def get_safe_zone(self) -> Optional[safezone.SafeZone]:
+        '''
+        Get the safe zone info.
+        '''
+        return self.SafeZone
