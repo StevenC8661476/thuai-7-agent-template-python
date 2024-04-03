@@ -19,7 +19,7 @@ class Logger:
 
     _lock = threading.Lock()
 
-    def __init__(self, namespace: str, level: Level) -> None:
+    def __init__(self, namespace: str, level: Level = Level.INFO) -> None:
         super().__init__()
 
         self._namespace = namespace
