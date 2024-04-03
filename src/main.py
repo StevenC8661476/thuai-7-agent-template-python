@@ -1,4 +1,5 @@
 from sdk.sdk import Sdk
+from sdk.logger import Logger
 
 import asyncio
 
