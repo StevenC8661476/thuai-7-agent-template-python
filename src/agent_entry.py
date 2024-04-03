@@ -12,6 +12,9 @@ class AgentEntry(Agent):
     async def initialize(self):
         await self._initialize()
 
+    async def finalize(self):
+        await self._finalize()
+
     def abandon(self, num: int, targetSupply: str):
         '''
         Abandon the supply.

@@ -58,8 +58,11 @@ async def main():
         await my_agent.initialize()
         await solution(my_agent)
 
-    except Exception as e:
-        my_agent.Logger.error(f"An error occurred: {e}")
+    except BaseException as e:
+        my_agent.Logger.error(f"An unhandled exception is caught while agent is running: {e}")
+
+    finally:
+        await my_agent.finalize()
 
 if __name__ == "__main__":
     asyncio.run(main())
