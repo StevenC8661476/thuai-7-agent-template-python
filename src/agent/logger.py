@@ -3,76 +3,35 @@
 The logger API is the API that can be used to log messages.
 """
 
-import sys
 import threading
-from abc import ABC, abstractmethod
 from datetime import datetime
+from enum import Enum
 
 from termcolor import cprint
 
-
-class ILogger(ABC):
-    """The logger interface.
-
-    The logger interface is the interface that can be used to log messages.
-    """
-    @abstractmethod
-    def debug(self, message: str) -> None:
-        """Logs a debug message.
-
-        Args:
-            message (str): The message to log.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def info(self, message: str) -> None:
-        """Logs an info message.
-
-        Args:
-            message (str): The message to log.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def warn(self, message: str) -> None:
-        """Logs a warning message.
-
-        Args:
-            message (str): The message to log.
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def error(self, message: str) -> None:
-        """Logs an error message.
-
-        Args:
-            message (str): The message to log.
-        """
-        raise NotImplementedError
-
-
-class Logger(ILogger):
+class Logger:
     _FORMAT = ""
+    class Level(Enum):
+        DEBUG = 0
+        INFO = 1
+        WARN = 2
+        ERROR = 3
 
     _lock = threading.Lock()
 
-    def __init__(self, namespace: str) -> None:
+    def __init__(self, namespace: str, level: Level = Level.INFO) -> None:
         super().__init__()
 
-        gettrace = getattr(sys, "gettrace", None)
-        if gettrace is not None and gettrace():
-            self._debug = True
-        else:
-            self._debug = False
-
         self._namespace = namespace
+        self._level = level
+
+    def set_level(self, level: Level):
+        self._level = level
 
     def debug(self, message: str) -> None:
-        if not self._debug:
+        if Logger.Level.DEBUG.value < self._level.value:
             return
-        
+
         with Logger._lock:
             cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
             cprint(f'DEBUG ', color='dark_grey', end='')
@@ -80,6 +39,9 @@ class Logger(ILogger):
             print()
 
     def info(self, message: str) -> None:
+        if Logger.Level.INFO.value < self._level.value:
+            return
+
         with Logger._lock:
             cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
             cprint(f'INFO  ', color='blue', end='')
@@ -87,6 +49,9 @@ class Logger(ILogger):
             print()
 
     def warn(self, message: str) -> None:
+        if Logger.Level.WARN.value < self._level.value:
+            return
+
         with Logger._lock:
             cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
             cprint(f'WARN  ', color='yellow', end='')
@@ -94,6 +59,9 @@ class Logger(ILogger):
             print()
 
     def error(self, message: str) -> None:
+        if Logger.Level.ERROR.value < self._level.value:
+            return
+
         with Logger._lock:
             cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
             cprint(f'ERROR ', color='red', end='')
