@@ -25,6 +25,9 @@ class Logger:
         self._namespace = namespace
         self._level = level
 
+    def set_level(self, level: Level):
+        self._level = level
+
     def debug(self, message: str) -> None:
         if Logger.Level.DEBUG.value < self._level.value:
             return
