@@ -65,7 +65,7 @@ class Client:
             try:
                 if not self.Message_queue.empty():
                     message: Message = self.Message_queue.get()
-                    json_string = json.dumps(message.get_obj())
+                    json_string = message.json()
 
                     try:
                         await self._connection.send(json_string) # type: ignore
