@@ -179,6 +179,11 @@ class Agent:
                         position = player.Position(
                             x = data["position"]["x"],
                             y = data["position"]["y"]
+                        ),
+                        inventory = player.Inventory(
+                            supplies = [
+                                player.Item(name = item["name"], num = item["num"]) for item in data["inventory"]
+                            ]
                         )
                     ) for data in msg_dict["players"]
                 ]
