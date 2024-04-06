@@ -71,7 +71,11 @@ class Client:
             try:
                 if not self._message_queue.empty():
                     message: Message = self._message_queue.get()
-                    json_string = message.json()
+                    try:
+                        json_string = message.json()
+                    except Exception as e:
+                        self._logger.error(f"Failed to serialize message: {e}")
+                        continue
 
                     try:
                         await self._connection.send(json_string) # type: ignore

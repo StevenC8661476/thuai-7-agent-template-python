@@ -6,7 +6,7 @@ class Position:
         self.y = y
 
 class Message:
-    def __init__(self, json_string: str = "\{\}"):
+    def __init__(self, json_string: str = "{}"):
         self.msg = json.loads(json_string)
 
     def json(self):
