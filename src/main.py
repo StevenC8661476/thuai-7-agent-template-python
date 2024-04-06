@@ -1,5 +1,6 @@
 import asyncio
 import random
+import traceback
 
 from agent import map, player, supplies
 from agent.logger import Logger
@@ -16,30 +17,30 @@ async def solution(agent: AgentEntry):
     while True:
 
         # Your solution here
-        agent.Logger.debug(f"There are {count} apples.")
         count += 1
 
-        if (1000 <= count and count < 3000):
-            if (count == 1000):
-                agent.Logger.info("Too many apples! I'm going to run!")
+        if (count == 150):
+            agent.Logger.info("Oh, let's see the safe zone.")
+            if agent.get_map() is not None:
+                agent.Logger.info(
+                    f"Safe zone:\n\
+                    Center: {(agent.get_safe_zone().center_x, agent.get_safe_zone().center_y)}\n\
+                    Radius: {(agent.get_safe_zone().radius)}"
+                )
+            else:
+                agent.Logger.info("Oh no, it is null.")
+
+        if (200 <= count and count < 500):
+            if (count == 200):
+                agent.Logger.info("I'm going to run!")
                 agent.Logger.set_level(Logger.Level.INFO)
             agent.move(random.uniform(0, 256), random.uniform(0, 256))
 
-        if (count == 3000):
+        if (count == 1000):
             agent.Logger.warn("I'm tired of running! I'm going to stop!")
             agent.stop()
 
-        if (count == 4000):
-            agent.Logger.info("Oh, let's see who's around me.")
-            if agent.get_player_info() is not None:
-                agent.Logger.info(
-                    f"Players:\n\
-                    {[player.PlayerId for player in agent.get_player_info()]}"
-                )
-            else:
-                agent.Logger.info("No one around me.")
-
-        if (count == 5000):
+        if (count == 1500):
             agent.Logger.error("I get bored. Goodbye!")
             break
 
@@ -60,6 +61,7 @@ async def main():
 
     except BaseException as e:
         my_agent.Logger.error(f"An unhandled exception is caught while agent is running: {e}")
+        my_agent.Logger.error(traceback.format_exc())
 
     finally:
         await my_agent.finalize()
