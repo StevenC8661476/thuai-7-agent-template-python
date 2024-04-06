@@ -7,10 +7,16 @@ class Position:
 
 class Message:
     def __init__(self, json_string: str = "{}"):
-        self.msg = json.loads(json_string)
+        try:
+            self.msg = json.loads(json_string)
+        except json.JSONDecodeError:
+            self.msg = {}
 
     def json(self):
-        return json.dumps(self.msg)
+        try:
+            return json.dumps(self.msg)
+        except Exception:
+            return "{}"
 
 class PerformAbandonMessage(Message):
     def __init__(self, numb: int, token: str, targetSupply: str):

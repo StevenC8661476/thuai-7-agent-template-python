@@ -20,11 +20,12 @@ async def solution(agent: AgentEntry):
         count += 1
 
         if (count == 150):
-            agent.Logger.info("Oh, let's see the map.")
+            agent.Logger.info("Oh, let's see the safe zone.")
             if agent.get_map() is not None:
                 agent.Logger.info(
-                    f"Map:\n\
-                    {[(wall.X, wall.Y) for wall in agent.get_map().Walls]}"
+                    f"Safe zone:\n\
+                    Center: {(agent.get_safe_zone().center_x, agent.get_safe_zone().center_y)}\n\
+                    Radius: {(agent.get_safe_zone().radius)}"
                 )
             else:
                 agent.Logger.info("Oh no, it is null.")
