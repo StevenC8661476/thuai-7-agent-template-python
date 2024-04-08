@@ -7,29 +7,29 @@ from agent.logger import Logger
 from agent_entry import AgentEntry
 
 async def solution(agent: AgentEntry):
-    # You might want to add some initialization here
-
     agent.Logger.set_level(Logger.Level.INFO)
 
-    while agent.get_map() is None\
-        or agent.get_player_info() is None\
-        or agent.get_supplies() is None\
-        or agent.get_safe_zone() is None:
+    # If you find that you are dropping too many messages,
+    # You can try increasing SLEEP_TIME.
+    SLEEP_TIME = 0.02
 
-        await asyncio.sleep(0.1)
+    # Wait until all information is ready, which means the game is started.
+    while agent.get_map() is None or agent.get_player_info() is None\
+        or agent.get_supplies() is None or agent.get_safe_zone() is None:
+        await asyncio.sleep(SLEEP_TIME)
 
     # You need to choose an original position to start the game.
     # We recommend you to choose the origin according to map and supply information.
     agent.choose_origin(0, 0)
 
     while True:
-        # Your solution here
+        # Your solution here.
+        # Note that if you want to use "continue" or "break" in this loop,
+        # You should add "await asyncio.sleep(SLEEP_TIME)" before them.
         agent.Logger.info("Attacking (0, 0)")
         agent.attack(0, 0)
 
-        # If you find that you are dropping too many messages, sleep more.
-        # Or try to optimize your code to perform less actions in one loop.
-        await asyncio.sleep(0.02)   # Do NOT delete this line or your agent may not be able to run.
+        await asyncio.sleep(SLEEP_TIME)   # Do NOT delete this line or your agent may not be able to run.
 
     # Usually you don't need to add anything here
     return
