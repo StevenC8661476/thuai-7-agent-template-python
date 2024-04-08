@@ -159,8 +159,11 @@ class Agent:
         Update the game information.
         '''
         try:
-            msg_dict = message.msg
-            msg_type = msg_dict["messageType"]
+            try:
+                msg_dict = message.msg
+                msg_type = msg_dict["messageType"]
+            except Exception as e:
+                self._logger.error(f"Failed get message type: {e}")
 
             if msg_type == "ERROR":
                 self._logger.warn(f"Received error message from server: {msg_dict['message']}")
@@ -193,8 +196,8 @@ class Agent:
                     length = msg_dict["length"],
                     walls = [
                         map.Position(
-                            x = wall["x"],
-                            y = wall["y"]
+                            x = wall["wallPositions"]["x"],
+                            y = wall["wallPositions"]["y"]
                         ) for wall in msg_dict["walls"]
                     ]
                 )
@@ -219,10 +222,10 @@ class Agent:
                 )
 
             else:
-                self._logger.warn(f"Unknown message type: {msg_type}")
+                self._logger.warn(f"Unknown message type: \"{msg_type}\"")
 
         except Exception as e:
-            self._logger.error(f"Failed to update information: {e}")
+            self._logger.error(f"Failed to update information of message \"{msg_type}\": {e}")
 
     def _send(self, message: message.Message):
         '''

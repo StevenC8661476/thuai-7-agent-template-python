@@ -7,13 +7,16 @@ from agent.logger import Logger
 from agent_entry import AgentEntry
 
 async def solution(agent: AgentEntry):
-
     # You might want to add some initialization here
 
-    agent.Logger.set_level(Logger.Level.DEBUG)
+    agent.Logger.set_level(Logger.Level.INFO)
 
-    while agent.get_map() is None or agent.get_player_info() is None or agent.get_supplies() is None:
-        continue
+    while agent.get_map() is None\
+        or agent.get_player_info() is None\
+        or agent.get_supplies() is None\
+        or agent.get_safe_zone() is None:
+
+        await asyncio.sleep(0.1)
 
     # You need to choose an original position to start the game.
     # We recommend you to choose the origin according to map and supply information.
