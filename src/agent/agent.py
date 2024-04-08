@@ -206,7 +206,8 @@ class Agent:
                         position = supplies.Position(
                             x = supply["position"]["x"],
                             y = supply["position"]["y"]
-                        )
+                        ),
+                        numb = supply["numb"]
                     ) for supply in msg_dict["supplies"]
                 ]
 

@@ -19,55 +19,82 @@ class AgentEntry(Agent):
         '''
         Abandon the supply.
         '''
-        self._abandon(num, targetSupply)
+        try:
+            self._abandon(num, targetSupply)
+        except Exception as e:
+            self.Logger.error("Failed to abandon: ", e)
 
     def pick_up(self, targetSupply: str, num: int, x: float, y: float):
         '''
         Pick up the supply.
         '''
-        self._pick_up(targetSupply, num, x, y)
+        try:
+            self._pick_up(targetSupply, num, x, y)
+        except Exception as e:
+            self.Logger.error("Failed to pick up: ", e)
 
     def switch_arm(self, targetFirearm: str):
         '''
         Switch the firearm.
         '''
-        self._switch_arm(targetFirearm)
+        try:
+            self._switch_arm(targetFirearm)
+        except Exception as e:
+            self.Logger.error("Failed to switch arm: ", e)
 
     def use_medicine(self, medicineName: str):
         '''
         Use the medicine.
         '''
-        self._use_medicine(medicineName)
+        try:
+            self._use_medicine(medicineName)
+        except Exception as e:
+            self.Logger.error("Failed to use medicine: ", e)
 
     def use_grenade(self, x: float, y: float):
         '''
         Use the grenade.
         '''
-        self._use_grenade(x, y)
+        try:
+            self._use_grenade(x, y)
+        except Exception as e:
+            self.Logger.error("Failed to use grenade: ", e)
 
     def move(self, x: float, y: float):
         '''
         Move to the position.
         '''
-        self._move(x, y)
+        try:
+            self._move(x, y)
+        except Exception as e:
+            self.Logger.error("Failed to move: ", e)
 
     def stop(self):
         '''
         Stop moving.
         '''
-        self._stop()
+        try:
+            self._stop()
+        except Exception as e:
+            self.Logger.error("Failed to stop: ", e)
 
     def attack(self, x: float, y: float):
         '''
         Attack the position.
         '''
-        self._attack(x, y)
+        try:
+            self._attack(x, y)
+        except Exception as e:
+            self.Logger.error("Failed to attack: ", e)
 
     def choose_origin(self, x: float, y: float):
         '''
         Choose the origin.
         '''
-        self._choose_origin(x, y)
+        try:
+            self._choose_origin(x, y)
+        except Exception as e:
+            self.Logger.error("Failed to choose origin: ", e)
 
     def get_player_info(self) -> Optional[List[player.Player]]:
         '''
