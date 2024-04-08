@@ -1,5 +1,4 @@
 import asyncio
-import random
 import traceback
 
 from agent import map, player, supplies
@@ -8,47 +7,29 @@ from agent.logger import Logger
 from agent_entry import AgentEntry
 
 async def solution(agent: AgentEntry):
+    agent.Logger.set_level(Logger.Level.INFO)
 
-    # You might want to add some initialization here
-    count = 100
+    # If you find that you are dropping too many messages,
+    # You can try increasing SLEEP_TIME.
+    SLEEP_TIME = 0.02
 
-    agent.Logger.set_level(Logger.Level.DEBUG)
+    # Wait until all information is ready, which means the game is started.
+    while agent.get_map() is None or agent.get_player_info() is None\
+        or agent.get_supplies() is None or agent.get_safe_zone() is None:
+        await asyncio.sleep(SLEEP_TIME)
+
+    # You need to choose an original position to start the game.
+    # We recommend you to choose the origin according to map and supply information.
+    agent.choose_origin(0, 0)
 
     while True:
+        # Your solution here.
+        # Note that if you want to use "continue" or "break" in this loop,
+        # You should add "await asyncio.sleep(SLEEP_TIME)" before them.
+        agent.Logger.info("Attacking (0, 0)")
+        agent.attack(0, 0)
 
-        # Your solution here
-        count += 1
-
-        if (count == 150):
-            agent.Logger.info("Oh, let's see the safe zone.")
-            if agent.get_map() is not None:
-                agent.Logger.info(
-                    f"Safe zone:\n\
-                    Center: {(agent.get_safe_zone().center_x, agent.get_safe_zone().center_y)}\n\
-                    Radius: {(agent.get_safe_zone().radius)}"
-                )
-            else:
-                agent.Logger.info("Oh no, it is null.")
-
-        if (200 <= count and count < 500):
-            if (count == 200):
-                agent.Logger.info("I'm going to run!")
-                agent.Logger.set_level(Logger.Level.INFO)
-            agent.move(random.uniform(0, 256), random.uniform(0, 256))
-
-        if (count == 1000):
-            agent.Logger.warn("I'm tired of running! I'm going to stop!")
-            agent.stop()
-
-        if (count == 1500):
-            agent.Logger.error("I get bored. Goodbye!")
-            break
-
-        '''
-        If you find that you are dropping too many messages, sleep more.
-        Or try to optimize your code to perform less actions in one loop.
-        '''
-        await asyncio.sleep(0.02)   # Do NOT delete this line or your agent may not be able to run.
+        await asyncio.sleep(SLEEP_TIME)   # Do NOT delete this line or your agent may not be able to run.
 
     # Usually you don't need to add anything here
     return
