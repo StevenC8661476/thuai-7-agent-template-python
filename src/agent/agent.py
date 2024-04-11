@@ -32,6 +32,7 @@ class Agent:
         '''
         self._logger.info("Initializing...")
         await self._client.run()
+        self._get_player_info()
 
     async def _finalize(self):
         '''
