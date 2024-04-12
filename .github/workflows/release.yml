@@ -11,7 +11,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sdk-python-${{ github.sha }}
+          name: agent-template-python-${{ github.sha }}
           path: src
 
   release:
@@ -30,25 +30,25 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: sdk-python-${{ github.sha }}
-          path: sdk-python
+          name: agent-template-python-${{ github.sha }}
+          path: agent-template-python
 
       - run: |
-          cp CHANGELOG.md LICENSE README.md sdk-python/
+          cp CHANGELOG.md LICENSE README.md agent-template-python/
 
       - name: Pack artifact (zip)
         if: startsWith(matrix.extension, 'zip')
         run: |
-          zip -r sdk-python.zip sdk-python/*
+          zip -r agent-template-python.zip agent-template-python/*
 
       - name: Pack artifact (tar)
         if: startsWith(matrix.extension, 'tar')
         run: |
-          tar -czvf sdk-python.tar.gz sdk-python/*
+          tar -czvf agent-template-python.tar.gz agent-template-python/*
 
       - name: Upload artifact to release
         uses: softprops/action-gh-release@v1
         with:
           append_body: true
           files: |
-            sdk-python.${{ matrix.extension }}
+            agent-template-python.${{ matrix.extension }}
