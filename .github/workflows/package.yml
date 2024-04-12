@@ -11,5 +11,5 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sdk-python-${{ github.sha }}
+          name: agent-template-python-${{ github.sha }}
           path: src

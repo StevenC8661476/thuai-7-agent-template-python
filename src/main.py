@@ -6,37 +6,49 @@ from agent.logger import Logger
 
 from agent_entry import AgentEntry
 
+'''
+In a solution, you will create your own agent to play the game.
+NOTE: If you want to do something like waiting for a few seconds,
+you should use "await asyncio.sleep()" rather than "time.sleep()".
+'''
 async def solution(agent: AgentEntry):
+    # You can log some messages to debug your agent with agent.Logger.
     agent.Logger.set_level(Logger.Level.INFO)
 
     # If you find that you are dropping too many messages,
     # You can try increasing SLEEP_TIME.
     SLEEP_TIME = 0.02
 
-    # Wait until all information is ready, which means the game is started.
+    # Wait until the game is ready.
     while agent.get_map() is None or agent.get_player_info() is None\
         or agent.get_supplies() is None or agent.get_safe_zone() is None:
         await asyncio.sleep(SLEEP_TIME)
 
-    # You need to choose an original position to start the game.
-    # We recommend you to choose the origin according to map and supply information.
+    # You can choose an original position when the game is at stage Preparing.
+    # If you don't choose an original position or the position is invalid,
+    # the game will choose a random position for you.
+    # Here we choose (0, 0) and wait for 10 seconds until the game starts.
+    agent.Logger.info("Choosing origin (0, 0)")
     agent.choose_origin(0, 0)
+    await asyncio.sleep(10)
 
     while True:
         # Your solution here.
-        # Note that if you want to use "continue" or "break" in this loop,
+        # Note that anytime you want to end, "continue", or "break" a loop,
         # You should add "await asyncio.sleep(SLEEP_TIME)" before them.
         agent.Logger.info("Attacking (0, 0)")
         agent.attack(0, 0)
 
         await asyncio.sleep(SLEEP_TIME)   # Do NOT delete this line or your agent may not be able to run.
 
-    # Usually you don't need to add anything here
+    # Usually you don't need to add anything after the loop
     return
 
 async def main():
+    version = "0.1.0"
+
     logger = Logger("Main")
-    logger.info("THUAI7 Agent Template (Python)")
+    logger.info(f"THUAI7 Agent Template (Python) v{version}")
     logger.info("Copyright (C) 2024 THUAI7")
 
     try:
