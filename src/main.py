@@ -35,14 +35,18 @@ async def solution(agent: AgentEntry):
     return
 
 async def main():
+    logger = Logger("Main")
+    logger.info("THUAI7 Agent Template (Python)")
+    logger.info("Copyright (C) 2024 THUAI7")
+
     try:
         my_agent = AgentEntry()
         await my_agent.initialize()
         await solution(my_agent)
 
-    except BaseException as e:
-        my_agent.Logger.error(f"An unhandled exception is caught while agent is running: {e}")
-        my_agent.Logger.error(traceback.format_exc())
+    except Exception as e:
+        logger.error(f"An unhandled exception is caught while agent is running: {e}")
+        logger.error(traceback.format_exc())
 
     finally:
         await my_agent.finalize()
