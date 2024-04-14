@@ -1,10 +1,39 @@
-import asyncio
-import traceback
-
 from agent import map, player, supplies
 from agent.logger import Logger
 
 from agent_entry import AgentEntry
+
+import asyncio
+import traceback
+
+'''
+Here are some constants you may need in your agent.
+'''
+# Names of armors
+PRIMARY_ARMOR = "PRIMARY_ARMOR"
+PREMIUM_ARMOR = "PREMIUM_ARMOR"
+
+# Names of weapons
+SHOTGUN = "S686"
+ASSAULT_RIFLE = "M16"
+SNIPER_RIFLE = "AWM"
+SUBMACHINE_GUN = "VECTOR"
+
+# Names of medicines
+BANDAGE = "BANDAGE"
+FIRST_AID_KIT = "FIRST_AID"
+
+# Name of bullet
+BULLET = "BULLET"
+
+# Name of grenade
+GRENADE = "GRENADE"
+
+###############################################################################
+# Things you can change starts here.
+
+# You can import something else if you need them.
+import random
 
 '''
 In a solution, you will create your own agent to play the game.
@@ -36,20 +65,25 @@ async def solution(agent: AgentEntry):
         # Your solution here.
         # Note that anytime you want to end, "continue", or "break" a loop,
         # You should add "await asyncio.sleep(SLEEP_TIME)" before them.
-        agent.Logger.info("Attacking (0, 0)")
-        agent.attack(0, 0)
+        x = random.random() * agent.get_map().Length
+        y = random.random() * agent.get_map().Length
+        agent.Logger.info(f"Moving to ({x}, {y})")
+        agent.move(x, y)
 
         await asyncio.sleep(SLEEP_TIME)   # Do NOT delete this line or your agent may not be able to run.
 
     # Usually you don't need to add anything after the loop
     return
 
+# Things you can change ends here.
+###############################################################################
+
 async def main():
     version = "0.1.0"
 
     logger = Logger("Main")
     logger.info(f"THUAI7 Agent Template (Python) v{version}")
-    logger.info("Copyright (C) 2024 THUAI7")
+    logger.info("Copyright (C) 2024 THUASTA")
 
     try:
         my_agent = AgentEntry()
