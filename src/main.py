@@ -49,7 +49,7 @@ async def main():
 
     logger = Logger("Main")
     logger.info(f"THUAI7 Agent Template (Python) v{version}")
-    logger.info("Copyright (C) 2024 THUAI7")
+    logger.info("Copyright (C) 2024 THUASTA")
 
     try:
         my_agent = AgentEntry()
