@@ -6,6 +6,29 @@ from agent_entry import AgentEntry
 import asyncio
 import traceback
 
+'''
+Here are some constants you may need in your agent.
+'''
+# Names of armors
+PRIMARY_ARMOR = "PRIMARY_ARMOR"
+PREMIUM_ARMOR = "PREMIUM_ARMOR"
+
+# Names of weapons
+SHOTGUN = "S686"
+ASSAULT_RIFLE = "M16"
+SNIPER_RIFLE = "AWM"
+SUBMACHINE_GUN = "VECTOR"
+
+# Names of medicines
+BANDAGE = "BANDAGE"
+FIRST_AID_KIT = "FIRST_AID"
+
+# Name of bullet
+BULLET = "BULLET"
+
+# Name of grenade
+GRENADE = "GRENADE"
+
 ###############################################################################
 # Things you can change starts here.
 
