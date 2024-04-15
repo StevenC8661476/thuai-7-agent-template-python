@@ -82,7 +82,7 @@ async def solution(agent: AgentEntry):
 ###############################################################################
 
 async def main():
-    version = "0.1.0"
+    version = "0.1.1"
 
     logger = Logger("Main")
     logger.info(f"THUAI7 Agent Template (Python) v{version}")
