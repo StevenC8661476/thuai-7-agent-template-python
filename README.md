@@ -19,7 +19,7 @@ The agent template is developed under `python 3.9.16`.
     - --port: Choose a port to connect.
     - --token: Choose a token for connection.
   - For example, if you input `python main.py --host 127.0.0.1 --port 8080 --token player1`, the agent will try to connect `127.0.0.1:8080` with token `"player1"`
-  - Note that a running server if necessary for connection.
+  - Note that a running server is necessary for connection.
 
 ### Create Your Own Agent
 
