@@ -50,8 +50,11 @@ async def solution(agent: AgentEntry):
 
     # Wait until the game is ready.
     while agent.get_map() is None or agent.get_player_info() is None\
-        or agent.get_supplies() is None or agent.get_safe_zone() is None:
+        or agent.get_supplies() is None or agent.get_safe_zone() is None\
+        or agent.get_player_id() is None:
         await asyncio.sleep(SLEEP_TIME)
+
+    agent.Logger.info(f"PlayerId of the agent: {agent.get_player_id()}")
 
     # You can choose an original position when the game is at stage Preparing.
     # If you don't choose an original position or the position is invalid,
