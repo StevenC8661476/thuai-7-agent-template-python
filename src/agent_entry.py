@@ -141,3 +141,9 @@ class AgentEntry(Agent):
         Get the safe zone info. Returns null if the game is not ready.
         '''
         return self.SafeZone
+
+    def get_player_id(self) -> Optional[int]:
+        '''
+        Get the player id. Returns null if the game is not ready.
+        '''
+        return self.PlayerId

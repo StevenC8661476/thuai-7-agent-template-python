@@ -25,6 +25,7 @@ class Agent:
         self.Map = None
         self.Supplies = None
         self.SafeZone = None
+        self.PlayerId = None
 
     async def _initialize(self):
         '''
@@ -221,6 +222,9 @@ class Agent:
                     center_y = msg_dict["center"]["y"],
                     radius = msg_dict["radius"]
                 )
+
+            elif msg_type == "PLAYER_ID":
+                self.PlayerId = msg_dict["playerId"]
 
             else:
                 self._logger.warn(f"Unknown message type: \"{msg_type}\"")
