@@ -3,6 +3,7 @@ class Position:
         self.X = x
         self.Y = y
 
+
 class Supply:
     def __init__(self, name: str, position: Position, numb: int):
         self.Name = name

@@ -1,13 +1,13 @@
 import asyncio
 import queue
 import time
-
 from typing import Callable, List
 
 import websockets
 
 from ..logger import Logger
 from .message import *
+
 
 class Client:
     _MESSAGE_TRANSMISSION_INTERVAL = 0.01
@@ -17,8 +17,7 @@ class Client:
         self._connection = None
         self._logger = Logger("SDK.Client")
         self._message_handler_list: List[Callable[[Message], None]] = []
-        self._message_queue = queue.Queue(
-            maxsize=Client._MESSAGE_QUEUE_CAPACITY)
+        self._message_queue = queue.Queue(maxsize=Client._MESSAGE_QUEUE_CAPACITY)
         self._task_list: List[asyncio.Task] = []
         self._url = f"ws://{host}:{port}"
 
@@ -44,14 +43,14 @@ class Client:
         for task in self._task_list:
             task.cancel()
 
-        await self._connection.close() # type: ignore
+        await self._connection.close()  # type: ignore
 
     async def _receive_loop(self) -> None:
         while True:
             try:
                 json_string = await self._connection.recv()  # type: ignore
                 try:
-                    message = Message(json_string)
+                    message = Message(str(json_string))
                 except Exception as e:
                     self._logger.error(f"Failed to parse message: {e}")
                     continue
@@ -78,7 +77,7 @@ class Client:
                         continue
 
                     try:
-                        await self._connection.send(json_string) # type: ignore
+                        await self._connection.send(json_string)  # type: ignore
 
                     except Exception as e:
                         self._logger.error(f"Failed to send message: {e}")

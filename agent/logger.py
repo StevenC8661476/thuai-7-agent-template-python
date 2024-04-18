@@ -9,8 +9,10 @@ from enum import Enum
 
 from termcolor import cprint
 
+
 class Logger:
     _FORMAT = ""
+
     class Level(Enum):
         DEBUG = 0
         INFO = 1
@@ -33,9 +35,9 @@ class Logger:
             return
 
         with Logger._lock:
-            cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
-            cprint(f'DEBUG ', color='dark_grey', end='')
-            cprint(f'[{self._namespace}] {message}', color='dark_grey', end='')
+            cprint(f"{Logger._get_current_time_string()} ", color="cyan", end="")
+            cprint(f"DEBUG ", color="dark_grey", end="")
+            cprint(f"[{self._namespace}] {message}", color="dark_grey", end="")
             print()
 
     def info(self, message: str) -> None:
@@ -43,9 +45,9 @@ class Logger:
             return
 
         with Logger._lock:
-            cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
-            cprint(f'INFO  ', color='blue', end='')
-            cprint(f'[{self._namespace}] {message}', color='white', end='')
+            cprint(f"{Logger._get_current_time_string()} ", color="cyan", end="")
+            cprint(f"INFO  ", color="blue", end="")
+            cprint(f"[{self._namespace}] {message}", color="white", end="")
             print()
 
     def warn(self, message: str) -> None:
@@ -53,9 +55,9 @@ class Logger:
             return
 
         with Logger._lock:
-            cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
-            cprint(f'WARN  ', color='yellow', end='')
-            cprint(f'[{self._namespace}] {message}', color='yellow', end='')
+            cprint(f"{Logger._get_current_time_string()} ", color="cyan", end="")
+            cprint(f"WARN  ", color="yellow", end="")
+            cprint(f"[{self._namespace}] {message}", color="yellow", end="")
             print()
 
     def error(self, message: str) -> None:
@@ -63,11 +65,11 @@ class Logger:
             return
 
         with Logger._lock:
-            cprint(f'{Logger._get_current_time_string()} ', color='cyan', end='')
-            cprint(f'ERROR ', color='red', end='')
-            cprint(f'[{self._namespace}] {message}', color='red', end='')
+            cprint(f"{Logger._get_current_time_string()} ", color="cyan", end="")
+            cprint(f"ERROR ", color="red", end="")
+            cprint(f"[{self._namespace}] {message}", color="red", end="")
             print()
 
     @staticmethod
     def _get_current_time_string() -> str:
-        return datetime.now().strftime(f'%H:%M:%S')
+        return datetime.now().strftime(f"%H:%M:%S")

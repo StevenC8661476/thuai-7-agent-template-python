@@ -2,32 +2,40 @@
 
 Python agent template for the 7th Tsinghua University Artificial Intelligence Challenge.
 
-## Environment
+## Usage
 
-The agent template is developed under `python 3.9.16`.
+### Prerequisites
 
-## How to Use
+- Python 3.12
 
-### Run the Agent
+### Install Dependencies
 
-1. Download latest release from [here](https://github.com/thuasta/thuai-7-agent-template-python/releases).
-2. Check `src/` folder.
-3. Run `pip install -r requirements.txt`.
-4. Run `python main.py`.
-  - Additional arguments:
-    - --host: Choose a server to connect.
-    - --port: Choose a port to connect.
-    - --token: Choose a token for connection.
-  - For example, if you input `python main.py --host 127.0.0.1 --port 8080 --token player1`, the agent will try to connect `127.0.0.1:8080` with token `"player1"`
-  - Note that a running server is necessary for connection.
+```bash
+pip install -r requirements.txt
+```
 
-### Create Your Own Agent
+### Write Your Code
 
-Follow the instruction in `main.py` to create your own agent.
+You can write your code in `main.py`. For experienced developers, you can also modify any other files in the project.
 
-### Interfaces
+### Run
 
-Yo can see all interfaces in `agent_entry.py`.
+If you modify the boilerplate, this section may be invalid.
+
+Run the following command to start the agent:
+
+```bash
+python main.py --server <server> --token <token>
+```
+
+- `<server>`: The server address of the game. (Default: `ws://localhost:14514`)
+- `<token>`: The token of the agent. (Default: `1919810`)
+
+For example:
+
+```bash
+python main.py --server ws://localhost:14514 --token 1919810
+```
 
 ## Contributing
 
@@ -37,4 +45,4 @@ PRs accepted.
 
 ## License
 
-GPL-3.0-only © Student Association of Science and Technology, Department of Automation, Tsinghua University
+CC0-1.0 © THUASTA

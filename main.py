@@ -1,14 +1,13 @@
-from agent import map, player, supplies
-from agent.logger import Logger
-
-from agent_entry import AgentEntry
-
 import asyncio
 import traceback
 
-'''
+from agent import map, player, supplies
+from agent.logger import Logger
+from agent_entry import AgentEntry
+
+"""
 Here are some constants you may need in your agent.
-'''
+"""
 # Names of armors
 PRIMARY_ARMOR = "PRIMARY_ARMOR"
 PREMIUM_ARMOR = "PREMIUM_ARMOR"
@@ -35,11 +34,13 @@ GRENADE = "GRENADE"
 # You can import something else if you need them.
 import random
 
-'''
+"""
 In a solution, you will create your own agent to play the game.
 NOTE: If you want to do something like waiting for a few seconds,
 you should use "await asyncio.sleep()" rather than "time.sleep()".
-'''
+"""
+
+
 async def solution(agent: AgentEntry):
     # You can log some messages to debug your agent with agent.Logger.
     agent.Logger.set_level(Logger.Level.INFO)
@@ -49,9 +50,13 @@ async def solution(agent: AgentEntry):
     SLEEP_TIME = 0.02
 
     # Wait until the game is ready.
-    while agent.get_map() is None or agent.get_player_info() is None\
-        or agent.get_supplies() is None or agent.get_safe_zone() is None\
-        or agent.get_player_id() is None:
+    while (
+        agent.get_map() is None
+        or agent.get_player_info() is None
+        or agent.get_supplies() is None
+        or agent.get_safe_zone() is None
+        or agent.get_player_id() is None
+    ):
         await asyncio.sleep(SLEEP_TIME)
 
     agent.Logger.info(f"PlayerId of the agent: {agent.get_player_id()}")
@@ -68,18 +73,22 @@ async def solution(agent: AgentEntry):
         # Your solution here.
         # Note that anytime you want to end, "continue", or "break" a loop,
         # You should add "await asyncio.sleep(SLEEP_TIME)" before them.
-        x = random.random() * agent.get_map().Length
-        y = random.random() * agent.get_map().Length
+        x = 0
+        y = 0
         agent.Logger.info(f"Moving to ({x}, {y})")
         agent.move(x, y)
 
-        await asyncio.sleep(SLEEP_TIME)   # Do NOT delete this line or your agent may not be able to run.
+        await asyncio.sleep(
+            SLEEP_TIME
+        )  # Do NOT delete this line or your agent may not be able to run.
 
     # Usually you don't need to add anything after the loop
     return
 
+
 # Things you can change ends here.
 ###############################################################################
+
 
 async def main():
     version = "0.1.1"
@@ -99,6 +108,7 @@ async def main():
 
     finally:
         await my_agent.finalize()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
