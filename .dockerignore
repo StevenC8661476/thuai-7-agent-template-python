@@ -1,0 +1,7 @@
+/.github/
+/.venv/
+/.dockerignore
+/.gitattributes
+/.gitignore
+/LICENSE
+/README.md
