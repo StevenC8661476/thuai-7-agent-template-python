@@ -9,12 +9,11 @@ from .logger import Logger
 class Agent:
     def __init__(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument("--host", type=str, default="localhost")
-        parser.add_argument("--port", type=int, default=14514)
-        parser.add_argument("--token", type=str, default="")
+        parser.add_argument("--server", type=str, default="ws://localhost:14514")
+        parser.add_argument("--token", type=str, default="1919810")
         args = parser.parse_args()
 
-        self._client = Client(host=args.host, port=args.port)
+        self._client = Client(server=args.server)
         self._client.register_message_handler(self._update)
         self._token = args.token
 

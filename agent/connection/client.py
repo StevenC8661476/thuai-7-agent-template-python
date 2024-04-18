@@ -13,13 +13,13 @@ class Client:
     _MESSAGE_TRANSMISSION_INTERVAL = 0.01
     _MESSAGE_QUEUE_CAPACITY = 100
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, server: str):
         self._connection = None
         self._logger = Logger("SDK.Client")
         self._message_handler_list: List[Callable[[Message], None]] = []
         self._message_queue = queue.Queue(maxsize=Client._MESSAGE_QUEUE_CAPACITY)
         self._task_list: List[asyncio.Task] = []
-        self._url = f"ws://{host}:{port}"
+        self._url = server
 
     def register_message_handler(self, handler: Callable[[Message], None]) -> None:
         self._message_handler_list.append(handler)
