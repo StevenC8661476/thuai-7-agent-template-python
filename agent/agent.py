@@ -221,7 +221,7 @@ class Agent:
                 )
 
             elif msg_type == "PLAYER_ID":
-                self._id = msg_dict["playerId"]
+                self._self_id = msg_dict["playerId"]
 
         except Exception as e:
             logging.error(f"error occurred in message handling: {e}")
