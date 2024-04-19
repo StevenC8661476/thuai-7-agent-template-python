@@ -1,10 +1,12 @@
-class Position:
-    def __init__(self, x: int, y: int):
-        self.X = x
-        self.Y = y
+from typing import List
+
+from .position import Position
 
 
 class Map:
-    def __init__(self, length: int, walls: list[Position]):
-        self.Length = length
-        self.Walls = walls
+    def __init__(self, length: int, obstacles: List[Position[int]]):
+        self.length = length
+        self.obstacles = obstacles
+
+    def __str__(self) -> str:
+        return f"Map{{length: {self.length}, obstacles: {self.obstacles}}}"

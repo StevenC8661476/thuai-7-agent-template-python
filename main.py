@@ -1,113 +1,64 @@
+import argparse
 import asyncio
-import traceback
+import logging
 
-from agent import map, player, supplies
-from agent.logger import Logger
-from agent_entry import AgentEntry
-
-"""
-Here are some constants you may need in your agent.
-"""
-# Names of armors
-PRIMARY_ARMOR = "PRIMARY_ARMOR"
-PREMIUM_ARMOR = "PREMIUM_ARMOR"
-
-# Names of weapons
-SHOTGUN = "S686"
-ASSAULT_RIFLE = "M16"
-SNIPER_RIFLE = "AWM"
-SUBMACHINE_GUN = "VECTOR"
-
-# Names of medicines
-BANDAGE = "BANDAGE"
-FIRST_AID_KIT = "FIRST_AID"
-
-# Name of bullet
-BULLET = "BULLET"
-
-# Name of grenade
-GRENADE = "GRENADE"
-
-###############################################################################
-# Things you can change starts here.
-
-# You can import something else if you need them.
-import random
-
-"""
-In a solution, you will create your own agent to play the game.
-NOTE: If you want to do something like waiting for a few seconds,
-you should use "await asyncio.sleep()" rather than "time.sleep()".
-"""
+from agent.agent import Agent
+from logic import loop, setup
 
 
-async def solution(agent: AgentEntry):
-    # You can log some messages to debug your agent with agent.Logger.
-    agent.Logger.set_level(Logger.Level.INFO)
-
-    # If you find that you are dropping too many messages,
-    # You can try increasing SLEEP_TIME.
-    SLEEP_TIME = 0.02
-
-    # Wait until the game is ready.
-    while (
-        agent.get_map() is None
-        or agent.get_player_info() is None
-        or agent.get_supplies() is None
-        or agent.get_safe_zone() is None
-        or agent.get_player_id() is None
-    ):
-        await asyncio.sleep(SLEEP_TIME)
-
-    agent.Logger.info(f"PlayerId of the agent: {agent.get_player_id()}")
-
-    # You can choose an original position when the game is at stage Preparing.
-    # If you don't choose an original position or the position is invalid,
-    # the game will choose a random position for you.
-    # Here we choose (0, 0) and wait for 10 seconds until the game starts.
-    agent.Logger.info("Choosing origin (0, 0)")
-    agent.choose_origin(0, 0)
-    await asyncio.sleep(10)
-
-    while True:
-        # Your solution here.
-        # Note that anytime you want to end, "continue", or "break" a loop,
-        # You should add "await asyncio.sleep(SLEEP_TIME)" before them.
-        x = 0
-        y = 0
-        agent.Logger.info(f"Moving to ({x}, {y})")
-        agent.move(x, y)
-
-        await asyncio.sleep(
-            SLEEP_TIME
-        )  # Do NOT delete this line or your agent may not be able to run.
-
-    # Usually you don't need to add anything after the loop
-    return
+class Options:
+    def __init__(self, server: str, token: str):
+        self.server = server
+        self.token = token
 
 
-# Things you can change ends here.
-###############################################################################
+DEFAULT_SERVER = "ws://localhost:14514"
+DEFAULT_TOKEN = "1919810"
+DEFAULT_LOOP_INTERVAL = 1.0  # In seconds.
 
 
 async def main():
-    version = "0.1.1"
+    options = parse_options()
 
-    logger = Logger("Main")
-    logger.info(f"THUAI7 Agent Template (Python) v{version}")
-    logger.info("Copyright (C) 2024 THUASTA")
+    agent = Agent(options.token, DEFAULT_LOOP_INTERVAL)
 
-    try:
-        my_agent = AgentEntry()
-        await my_agent.initialize()
-        await solution(my_agent)
+    logging.info(f"{agent} is starting with server {options.server}")
 
-    except Exception as e:
-        logger.error(f"An unhandled exception is caught while agent is running: {e}")
-        logger.error(traceback.format_exc())
+    await agent.connect(options.server)
 
-    finally:
-        await my_agent.finalize()
+    is_previous_game_ready = False
+    is_setup = False
+
+    while True:
+        await asyncio.sleep(DEFAULT_LOOP_INTERVAL)
+
+        if not agent.is_game_ready():
+            if is_previous_game_ready:
+                logging.error(f"{agent} is no longer in a ready game")
+                is_previous_game_ready = False
+
+            logging.debug(f"{agent} is waiting for the game to be ready")
+            continue
+        if not is_previous_game_ready:
+            logging.info(f"{agent} is now in a ready game")
+            is_previous_game_ready = True
+
+        if not is_setup:
+            await setup(agent)
+            logging.info(f"{agent} is now set up")
+            is_setup = True
+
+        await loop(agent)
+
+
+def parse_options() -> Options:
+    parser = argparse.ArgumentParser("agent")
+    parser.add_argument(
+        "--server", type=str, help="Server address", default=DEFAULT_SERVER
+    )
+    parser.add_argument("--token", type=str, help="Agent token", default=DEFAULT_TOKEN)
+    args = parser.parse_args()
+    return Options(server=args.server, token=args.token)
 
 
 if __name__ == "__main__":

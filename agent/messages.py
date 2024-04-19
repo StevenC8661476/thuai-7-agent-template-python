@@ -22,48 +22,48 @@ class Message:
 
 
 class PerformAbandonMessage(Message):
-    def __init__(self, numb: int, token: str, targetSupply: str):
+    def __init__(self, numb: int, token: str, target_supply: str):
         super().__init__()
         self.msg["messageType"] = "PERFORM_ABANDON"
         self.msg["numb"] = numb
         self.msg["token"] = token
-        self.msg["targetSupply"] = targetSupply
+        self.msg["targetSupply"] = target_supply
 
 
 class PerformPickUpMessage(Message):
     def __init__(
-        self, token: str, targetSupply: str, num: int, targetPosition: Position
+        self, token: str, target_supply: str, num: int, target_position: Position
     ):
         super().__init__()
         self.msg["messageType"] = "PERFORM_PICKUP"
         self.msg["token"] = token
-        self.msg["targetSupply"] = targetSupply
+        self.msg["targetSupply"] = target_supply
         self.msg["num"] = num
-        self.msg["targetPosition"] = {"x": targetPosition.x, "y": targetPosition.y}
+        self.msg["targetPosition"] = {"x": target_position.x, "y": target_position.y}
 
 
 class PerformSwitchArmMessage(Message):
-    def __init__(self, token: str, targetFirearm: str):
+    def __init__(self, token: str, target_firearm: str):
         super().__init__()
         self.msg["messageType"] = "PERFORM_SWITCH_ARM"
         self.msg["token"] = token
-        self.msg["targetFirearm"] = targetFirearm
+        self.msg["targetFirearm"] = target_firearm
 
 
 class PerformUseMedicineMessage(Message):
-    def __init__(self, token: str, medicineName: str):
+    def __init__(self, token: str, medicine_name: str):
         super().__init__()
         self.msg["messageType"] = "PERFORM_USE_MEDICINE"
         self.msg["token"] = token
-        self.msg["medicineName"] = medicineName
+        self.msg["medicineName"] = medicine_name
 
 
 class PerformUseGrenadeMessage(Message):
-    def __init__(self, token: str, targetPosition: Position):
+    def __init__(self, token: str, target_position: Position):
         super().__init__()
         self.msg["messageType"] = "PERFORM_USE_GRENADE"
         self.msg["token"] = token
-        self.msg["targetPosition"] = {"x": targetPosition.x, "y": targetPosition.y}
+        self.msg["targetPosition"] = {"x": target_position.x, "y": target_position.y}
 
 
 class PerformMoveMessage(Message):
@@ -82,11 +82,11 @@ class PerformStopMessage(Message):
 
 
 class PerformAttackMessage(Message):
-    def __init__(self, token: str, targetPosition: Position):
+    def __init__(self, token: str, target_position: Position):
         super().__init__()
         self.msg["messageType"] = "PERFORM_ATTACK"
         self.msg["token"] = token
-        self.msg["targetPosition"] = {"x": targetPosition.x, "y": targetPosition.y}
+        self.msg["targetPosition"] = {"x": target_position.x, "y": target_position.y}
 
 
 class GetPlayerInfoMessage(Message):
@@ -104,8 +104,8 @@ class GetMapMessage(Message):
 
 
 class ChooseOriginMessage(Message):
-    def __init__(self, token: str, originPosition: Position):
+    def __init__(self, token: str, origin_position: Position):
         super().__init__()
         self.msg["messageType"] = "CHOOSE_ORIGIN"
         self.msg["token"] = token
-        self.msg["originPosition"] = {"x": originPosition.x, "y": originPosition.y}
+        self.msg["originPosition"] = {"x": origin_position.x, "y": origin_position.y}

@@ -1,191 +1,209 @@
-import argparse
+import asyncio
+import logging
+from typing import List, Literal, Optional
 
-from . import map, player, safezone, supplies
-from .connection import message
-from .connection.client import Client
-from .logger import Logger
+from . import messages
+from .map import Map
+from .player_info import ArmorKind, Item, ItemKind, PlayerInfo
+from .position import Position
+from .safe_zone import SafeZone
+from .supply import Supply
+from .websocket_client import WebsocketClient
+
+type MedicineKind = Literal[
+    "BANDAGE",
+    "FIRST_AID",
+]
 
 
 class Agent:
-    def __init__(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--server", type=str, default="ws://localhost:14514")
-        parser.add_argument("--token", type=str, default="1919810")
-        args = parser.parse_args()
+    def __init__(self, token: str, loop_interval: float):
+        self._loop_interval = loop_interval
+        self._token = token
 
-        self._client = Client(server=args.server)
-        self._client.register_message_handler(self._update)
-        self._token = args.token
+        self._all_player_info: Optional[List[PlayerInfo]] = None
+        self._map: Optional[Map] = None
+        self._supplies: Optional[List[Supply]] = None
+        self._safe_zone: Optional[SafeZone] = None
+        self._self_id: Optional[int] = None
 
-        self._logger = Logger("Agent")
+        self._websocket_client = WebsocketClient("")  # Just a placeholder.
+        self._task_list: List[asyncio.Task] = []
 
-        self.PlayerInfo = None
-        self.Map = None
-        self.Supplies = None
-        self.SafeZone = None
-        self.PlayerId = None
+    def __str__(self) -> str:
+        return f"Agent{{token: {self._token}}}"
 
-    async def _initialize(self):
-        """
-        Initialize the agent.
-        """
-        self._logger.info("Initializing...")
-        await self._client.run()
-        self._get_player_info()
+    @property
+    def all_player_info(self) -> Optional[List[PlayerInfo]]:
+        return self._all_player_info
 
-    async def _finalize(self):
-        """
-        Finalize the agent.
-        """
-        self._logger.info("Finalizing...")
-        await self._client.stop()
+    @property
+    def map(self) -> Optional[Map]:
+        return self._map
 
-    def _abandon(self, num: int, targetSupply: str):
-        """
-        Abandon the supply.
-        """
-        self._send(
-            message.PerformAbandonMessage(
-                token=self._token, numb=num, targetSupply=targetSupply
-            )
+    @property
+    def supplies(self) -> Optional[List[Supply]]:
+        return self._supplies
+
+    @property
+    def safe_zone(self) -> Optional[SafeZone]:
+        return self._safe_zone
+
+    @property
+    def self_id(self) -> Optional[int]:
+        return self._self_id
+
+    @property
+    def token(self) -> str:
+        return self._token
+
+    async def connect(self, server: str):
+        self._websocket_client = WebsocketClient(server)
+        self._websocket_client.register_message_handler(self._on_message)
+        await self._websocket_client.run()
+
+        self._task_list.append(asyncio.create_task(self._loop()))
+
+    async def disconnect(self):
+        for task in self._task_list:
+            task.cancel()
+
+        await self._websocket_client.stop()
+
+    def is_game_ready(self) -> bool:
+        return (
+            self._all_player_info is not None
+            and self._map is not None
+            and self._supplies is not None
+            and self._safe_zone is not None
+            and self._self_id is not None
         )
 
-    def _pick_up(self, targetSupply: str, num: int, x: float, y: float):
-        """
-        Pick up the supply.
-        """
-        self._send(
-            message.PerformPickUpMessage(
+    def abandon(self, item_kind: ItemKind, count: int):
+        self._websocket_client.send(
+            messages.PerformAbandonMessage(
                 token=self._token,
-                targetSupply=targetSupply,
-                num=num,
-                targetPosition=message.Position(x=x, y=y),
+                numb=count,
+                target_supply=item_kind,
             )
         )
 
-    def _switch_arm(self, targetFirearm: str):
-        """
-        Switch the firearm.
-        """
-        self._send(
-            message.PerformSwitchArmMessage(
-                token=self._token, targetFirearm=targetFirearm
+    def pick_up(self, item_kind: ItemKind, count: int, position: Position[float]):
+        self._websocket_client.send(
+            messages.PerformPickUpMessage(
+                token=self._token,
+                target_supply=item_kind,
+                num=count,
+                target_position=messages.Position(x=position.x, y=position.y),
             )
         )
 
-    def _use_medicine(self, medicineName: str):
-        """
-        Use the medicine.
-        """
-        self._send(
-            message.PerformUseMedicineMessage(
-                token=self._token, medicineName=medicineName
+    def switch_armor(self, item_kind: ArmorKind):
+        self._websocket_client.send(
+            messages.PerformSwitchArmMessage(
+                token=self._token,
+                target_firearm=item_kind,
             )
         )
 
-    def _use_grenade(self, x: float, y: float):
-        """
-        Use the grenade.
-        """
-        self._send(
-            message.PerformUseGrenadeMessage(
-                token=self._token, targetPosition=message.Position(x=x, y=y)
+    def use_medicine(self, item_kind: MedicineKind):
+        self._websocket_client.send(
+            messages.PerformUseMedicineMessage(
+                token=self._token,
+                medicine_name=item_kind,
             )
         )
 
-    def _move(self, x: float, y: float):
-        """
-        Move to the destination.
-        """
-        self._send(
-            message.PerformMoveMessage(
-                token=self._token, destination=message.Position(x=x, y=y)
+    def use_grenade(self, position: Position[float]):
+        self._websocket_client.send(
+            messages.PerformUseGrenadeMessage(
+                token=self._token,
+                target_position=messages.Position(x=position.x, y=position.y),
             )
         )
 
-    def _stop(self):
-        """
-        Stop moving.
-        """
-        self._send(message.PerformStopMessage(token=self._token))
-
-    def _attack(self, x: float, y: float):
-        """
-        Attack the target.
-        """
-        self._send(
-            message.PerformAttackMessage(
-                token=self._token, targetPosition=message.Position(x=x, y=y)
+    def move(self, position: Position[float]):
+        self._websocket_client.send(
+            messages.PerformMoveMessage(
+                token=self._token,
+                destination=messages.Position(x=position.x, y=position.y),
             )
         )
 
-    def _get_player_info(self):
-        """
-        Get the player information.
-        """
-        self._send(message.GetPlayerInfoMessage(token=self._token))
-
-    def _get_map(self):
-        """
-        Get the map information.
-        """
-        self._send(message.GetMapMessage(token=self._token))
-
-    def _choose_origin(self, x: float, y: float):
-        """
-        Choose the origin.
-        """
-        self._send(
-            message.ChooseOriginMessage(
-                token=self._token, originPosition=message.Position(x=x, y=y)
+    def stop(self):
+        self._websocket_client.send(
+            messages.PerformStopMessage(
+                token=self._token,
             )
         )
 
-    def _update(self, message: message.Message):
-        """
-        Update the game information.
-        """
-        try:
+    def attack(self, position: Position[float]):
+        self._websocket_client.send(
+            messages.PerformAttackMessage(
+                token=self._token,
+                target_position=messages.Position(x=position.x, y=position.y),
+            )
+        )
+
+    def choose_origin(self, position: Position[float]):
+        self._websocket_client.send(
+            messages.ChooseOriginMessage(
+                token=self._token,
+                origin_position=messages.Position(x=position.x, y=position.y),
+            )
+        )
+
+    async def _loop(self):
+        while True:
             try:
-                msg_dict = message.msg
-                msg_type = msg_dict["messageType"]
-            except Exception as e:
-                self._logger.error(f"Failed get message type: {e}")
-
-            if msg_type == "ERROR":
-                self._logger.warn(
-                    f"Received error message from server: {msg_dict['message']}"
+                await asyncio.sleep(self._loop_interval)
+                self._websocket_client.send(
+                    messages.GetPlayerInfoMessage(
+                        token=self._token,
+                    )
+                )
+                self._websocket_client.send(
+                    messages.GetMapMessage(
+                        token=self._token,
+                    )
                 )
 
+            except Exception as e:
+                logging.error(f"error occurred in agent loop: {e}")
+
+    def _on_message(self, message: messages.Message):
+        try:
+            msg_dict = message.msg
+            msg_type = msg_dict["messageType"]
+
+            if msg_type == "ERROR":
+                logging.error(f"error from server: {msg_dict['message']}")
+
             elif msg_type == "PLAYERS_INFO":
-                self.PlayerInfo = [
-                    player.Player(
-                        playerId=data["playerId"],
+                self._all_player_info = [
+                    PlayerInfo(
+                        id=data["playerId"],
                         armor=data["armor"],
                         health=data["health"],
                         speed=data["speed"],
-                        firearm=player.Firearm(
-                            name=data["firearm"]["name"],
-                            distance=data["firearm"]["distance"],
-                        ),
-                        position=player.Position(
+                        firearm=data["firearm"]["name"],
+                        range=data["firearm"]["distance"],
+                        position=Position(
                             x=data["position"]["x"], y=data["position"]["y"]
                         ),
-                        inventory=player.Inventory(
-                            supplies=[
-                                player.Item(name=item["name"], num=item["num"])
-                                for item in data["inventory"]
-                            ]
-                        ),
+                        inventory=[
+                            Item(kind=item["name"], count=item["num"])
+                            for item in data["inventory"]
+                        ],
                     )
                     for data in msg_dict["players"]
                 ]
 
             elif msg_type == "MAP":
-                self.Map = map.Map(
+                self._map = Map(
                     length=msg_dict["length"],
-                    walls=[
-                        map.Position(
+                    obstacles=[
+                        Position(
                             x=wall["wallPositions"]["x"], y=wall["wallPositions"]["y"]
                         )
                         for wall in msg_dict["walls"]
@@ -193,37 +211,27 @@ class Agent:
                 )
 
             elif msg_type == "SUPPLIES":
-                self.Supplies = [
-                    supplies.Supply(
-                        name=supply["name"],
-                        position=supplies.Position(
+                self._supplies = [
+                    Supply(
+                        kind=supply["name"],
+                        position=Position(
                             x=supply["position"]["x"], y=supply["position"]["y"]
                         ),
-                        numb=supply["numb"],
+                        count=supply["numb"],
                     )
                     for supply in msg_dict["supplies"]
                 ]
 
             elif msg_type == "SAFE_ZONE":
-                self.SafeZone = safezone.SafeZone(
-                    center_x=msg_dict["center"]["x"],
-                    center_y=msg_dict["center"]["y"],
+                self._safe_zone = SafeZone(
+                    center=Position(
+                        x=msg_dict["center"]["x"], y=msg_dict["center"]["y"]
+                    ),
                     radius=msg_dict["radius"],
                 )
 
             elif msg_type == "PLAYER_ID":
-                self.PlayerId = msg_dict["playerId"]
-
-            else:
-                self._logger.warn(f'Unknown message type: "{msg_type}"')
+                self._id = msg_dict["playerId"]
 
         except Exception as e:
-            self._logger.error(
-                f'Failed to update information of message "{msg_type}": {e}'
-            )
-
-    def _send(self, message: message.Message):
-        """
-        Send a message to the server.
-        """
-        self._client.send(message)
+            logging.error(f"error occurred in message handling: {e}")
