@@ -35,7 +35,7 @@ class PerformPickUpMessage(Message):
         self, token: str, target_supply: str, num: int, target_position: Position
     ):
         super().__init__()
-        self.msg["messageType"] = "PERFORM_PICKUP"
+        self.msg["messageType"] = "PERFORM_PICK_UP"
         self.msg["token"] = token
         self.msg["targetSupply"] = target_supply
         self.msg["num"] = num
