@@ -4,7 +4,7 @@ from typing import List, Literal, Optional
 
 from . import messages
 from .map import Map
-from .player_info import ArmorKind, Item, ItemKind, PlayerInfo
+from .player_info import FirearmKind, Item, ItemKind, PlayerInfo
 from .position import Position
 from .safe_zone import SafeZone
 from .supply import Supply
@@ -98,7 +98,7 @@ class Agent:
             )
         )
 
-    def switch_armor(self, item_kind: ArmorKind):
+    def switch_weapon(self, item_kind: FirearmKind):
         self._websocket_client.send(
             messages.PerformSwitchArmMessage(
                 token=self._token,
