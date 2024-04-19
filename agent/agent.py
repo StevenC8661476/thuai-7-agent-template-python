@@ -62,7 +62,15 @@ class Agent:
         self._websocket_client.register_message_handler(self._on_message)
         await self._websocket_client.run()
 
-        self._task_list.append(asyncio.create_task(self._loop()))
+        try:
+            await asyncio.sleep(self._loop_interval)
+            self._websocket_client.send(
+                messages.GetPlayerInfoMessage(
+                    token=self._token,
+                )
+            )
+        except Exception as e:
+            logging.error(f"error occurred when joining a game: {e}")
 
     async def disconnect(self):
         for task in self._task_list:
@@ -152,24 +160,6 @@ class Agent:
                 origin_position=messages.Position(x=position.x, y=position.y),
             )
         )
-
-    async def _loop(self):
-        while True:
-            try:
-                await asyncio.sleep(self._loop_interval)
-                self._websocket_client.send(
-                    messages.GetPlayerInfoMessage(
-                        token=self._token,
-                    )
-                )
-                self._websocket_client.send(
-                    messages.GetMapMessage(
-                        token=self._token,
-                    )
-                )
-
-            except Exception as e:
-                logging.error(f"error occurred in agent loop: {e}")
 
     def _on_message(self, message: messages.Message):
         try:
