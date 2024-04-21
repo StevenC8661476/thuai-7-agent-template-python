@@ -20,7 +20,7 @@ DEFAULT_LOOP_INTERVAL = 1.0  # In seconds.
 async def main():
     options = parse_options()
 
-    agent = Agent(options.token, DEFAULT_LOOP_INTERVAL)
+    agent = Agent(options.token)
 
     logging.info(f"{agent} is starting with server {options.server}")
 

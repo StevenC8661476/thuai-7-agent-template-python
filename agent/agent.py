@@ -17,8 +17,7 @@ type MedicineKind = Literal[
 
 
 class Agent:
-    def __init__(self, token: str, loop_interval: float):
-        self._loop_interval = loop_interval
+    def __init__(self, token: str):
         self._token = token
 
         self._all_player_info: Optional[List[PlayerInfo]] = None
@@ -62,15 +61,11 @@ class Agent:
         self._websocket_client.register_message_handler(self._on_message)
         await self._websocket_client.run()
 
-        try:
-            await asyncio.sleep(self._loop_interval)
-            self._websocket_client.send(
-                messages.GetPlayerInfoMessage(
-                    token=self._token,
-                )
+        self._websocket_client.send(
+            messages.GetPlayerInfoMessage(
+                token=self._token,
             )
-        except Exception as e:
-            logging.error(f"error occurred when joining a game: {e}")
+        )
 
     async def disconnect(self):
         for task in self._task_list:
@@ -106,7 +101,7 @@ class Agent:
             )
         )
 
-    def switch_weapon(self, item_kind: FirearmKind):
+    def switch_firearm(self, item_kind: FirearmKind):
         self._websocket_client.send(
             messages.PerformSwitchArmMessage(
                 token=self._token,
