@@ -3,15 +3,12 @@ import asyncio
 import logging
 
 from agent.agent import Agent
-
 from logic import loop, setup
-
-"""You can use the example below to test your agent."""
-# from logic_example import loop, setup
 
 
 class Options:
-    def __init__(self, server: str, token: str):
+    def __init__(self, logging_level: int, server: str, token: str):
+        self.logging_level = logging_level
         self.server = server
         self.token = token
 
@@ -19,15 +16,15 @@ class Options:
 DEFAULT_SERVER = "ws://localhost:14514"
 DEFAULT_TOKEN = "1919810"
 DEFAULT_LOOP_INTERVAL = 0.1  # In seconds.
+LOGGING_FORMAT = "[%(asctime)s] [%(levelname)s] %(message)s"
 
 
 async def main():
     options = parse_options()
 
-    agent = Agent(options.token)
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-    )
+    logging.basicConfig(level=options.logging_level, format=LOGGING_FORMAT)
+
+    agent = Agent(options.token, DEFAULT_LOOP_INTERVAL)
     logging.info(f"{agent} is starting with server {options.server}")
 
     await agent.connect(options.server)
@@ -60,11 +57,26 @@ async def main():
 def parse_options() -> Options:
     parser = argparse.ArgumentParser("agent")
     parser.add_argument(
+        "--logging-level",
+        type=int,
+        help="Logging level",
+        default=logging.INFO,
+        choices=[
+            logging.CRITICAL,
+            logging.ERROR,
+            logging.WARNING,
+            logging.INFO,
+            logging.DEBUG,
+        ],
+    )
+    parser.add_argument(
         "--server", type=str, help="Server address", default=DEFAULT_SERVER
     )
     parser.add_argument("--token", type=str, help="Agent token", default=DEFAULT_TOKEN)
     args = parser.parse_args()
-    return Options(server=args.server, token=args.token)
+    return Options(
+        logging_level=args.logging_level, server=args.server, token=args.token
+    )
 
 
 if __name__ == "__main__":

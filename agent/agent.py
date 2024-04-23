@@ -17,8 +17,9 @@ type MedicineKind = Literal[
 
 
 class Agent:
-    def __init__(self, token: str):
+    def __init__(self, token: str, loop_interval: float):
         self._token = token
+        self._loop_interval = loop_interval
 
         self._all_player_info: Optional[List[PlayerInfo]] = None
         self._map: Optional[Map] = None
@@ -26,7 +27,7 @@ class Agent:
         self._safe_zone: Optional[SafeZone] = None
         self._self_id: Optional[int] = None
 
-        self._websocket_client = WebsocketClient("")  # Just a placeholder.
+        self._websocket_client = WebsocketClient("")
         self._task_list: List[asyncio.Task] = []
 
     def __str__(self) -> str:
@@ -61,11 +62,7 @@ class Agent:
         self._websocket_client.register_message_handler(self._on_message)
         await self._websocket_client.run()
 
-        self._websocket_client.send(
-            messages.GetPlayerInfoMessage(
-                token=self._token,
-            )
-        )
+        self._task_list.append(asyncio.create_task(self._loop()))
 
     async def disconnect(self):
         for task in self._task_list:
@@ -153,6 +150,13 @@ class Agent:
             messages.ChooseOriginMessage(
                 token=self._token,
                 origin_position=messages.Position(x=position.x, y=position.y),
+            )
+        )
+
+    async def _loop(self):
+        self._websocket_client.send(
+            messages.GetPlayerInfoMessage(
+                token=self._token,
             )
         )
 

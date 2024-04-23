@@ -10,8 +10,8 @@ from . import messages
 
 
 class WebsocketClient:
-    _MESSAGE_TRANSMISSION_INTERVAL = 0.01
-    _MESSAGE_QUEUE_CAPACITY = 100
+    _MESSAGE_TRANSMISSION_INTERVAL = 0.1
+    _MESSAGE_QUEUE_CAPACITY = 5
 
     def __init__(self, server: str):
         self._connection = None
