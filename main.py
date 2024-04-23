@@ -4,8 +4,10 @@ import logging
 
 from agent.agent import Agent
 
-# from logic import loop, setup
-from logic_example import loop, setup
+from logic import loop, setup
+
+"""You can use the example below to test your agent."""
+# from logic_example import loop, setup
 
 
 class Options:
