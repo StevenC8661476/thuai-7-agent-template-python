@@ -3,7 +3,9 @@ import asyncio
 import logging
 
 from agent.agent import Agent
-from logic import loop, setup
+
+# from logic import loop, setup
+from logic_example import loop, setup
 
 
 class Options:
@@ -14,14 +16,16 @@ class Options:
 
 DEFAULT_SERVER = "ws://localhost:14514"
 DEFAULT_TOKEN = "1919810"
-DEFAULT_LOOP_INTERVAL = 1.0  # In seconds.
+DEFAULT_LOOP_INTERVAL = 0.1  # In seconds.
 
 
 async def main():
     options = parse_options()
 
     agent = Agent(options.token)
-
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
     logging.info(f"{agent} is starting with server {options.server}")
 
     await agent.connect(options.server)
