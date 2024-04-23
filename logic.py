@@ -43,7 +43,7 @@ async def loop(agent: Agent):
 
     global path
 
-    if self_position_int not in path:
+    if self_position_int not in path or opponent_position_int not in path:
         path = find_path_befs(game_map, self_position_int, opponent_position_int)
 
         if len(path) == 0:
@@ -82,4 +82,4 @@ def find_path_befs(
     finder = BestFirst()
     path, _ = finder.find_path(start_node, end_node, game_map_grid)
     assert isinstance(path, list)
-    return path
+    return [Position[int](x, y) for x, y in path]
