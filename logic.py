@@ -1,12 +1,9 @@
 import logging
 from typing import List
 
-from pathfinding.core.grid import Grid
-from pathfinding.finder.best_first import BestFirst
-
 from agent.agent import Agent
-from agent.map import Map
 from agent.position import Position
+from agent.path_finding import find_path_befs
 
 path: List[Position[int]] = []
 
@@ -66,20 +63,3 @@ async def loop(agent: Agent):
         return
 
     agent.attack(opponent_info.position)
-
-
-def find_path_befs(
-    game_map: Map, start: Position[int], end: Position[int]
-) -> List[Position[int]]:
-    game_map_matrix = [
-        [1 for _ in range(game_map.length)] for _ in range(game_map.length)
-    ]
-    for obstacle in game_map.obstacles:
-        game_map_matrix[obstacle.x][obstacle.y] = 0
-    game_map_grid = Grid(matrix=game_map_matrix)
-    start_node = game_map_grid.node(start.x, start.y)
-    end_node = game_map_grid.node(end.x, end.y)
-    finder = BestFirst()
-    path, _ = finder.find_path(start_node, end_node, game_map_grid)
-    assert isinstance(path, list)
-    return [Position[int](x, y) for x, y in path]
