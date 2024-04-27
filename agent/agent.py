@@ -88,13 +88,12 @@ class Agent:
             )
         )
 
-    def pick_up(self, item_kind: ItemKind, count: int, position: Position[float]):
+    def pick_up(self, item_kind: ItemKind, count: int):
         self._websocket_client.send(
             messages.PerformPickUpMessage(
                 token=self._token,
                 target_supply=item_kind,
-                num=count,
-                target_position=messages.Position(x=position.x, y=position.y),
+                num=count
             )
         )
 

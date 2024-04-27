@@ -39,7 +39,6 @@ class PerformPickUpMessage(Message):
         self.msg["token"] = token
         self.msg["targetSupply"] = target_supply
         self.msg["num"] = num
-        self.msg["targetPosition"] = {"x": target_position.x, "y": target_position.y}
 
 
 class PerformSwitchArmMessage(Message):
