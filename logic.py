@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from pathfinding.core.grid import Grid
 from pathfinding.finder.best_first import BestFirst
@@ -8,6 +8,7 @@ from agent.agent import Agent
 from agent.map import Map
 from agent.position import Position
 
+game_map_grid: Optional[Grid] = None
 path: List[Position[int]] = []
 
 
@@ -34,6 +35,16 @@ async def loop(agent: Agent):
     game_map = agent.map
     assert game_map is not None
 
+    global game_map_grid
+
+    if game_map_grid is None:
+        game_map_matrix = [
+            [1 for _ in range(game_map.length)] for _ in range(game_map.length)
+        ]
+        for obstacle in game_map.obstacles:
+            game_map_matrix[obstacle.x][obstacle.y] = 0
+        game_map_grid = Grid(matrix=game_map_matrix)
+
     self_position_int = Position[int](
         int(self_info.position.x), int(self_info.position.y)
     )
@@ -44,7 +55,7 @@ async def loop(agent: Agent):
     global path
 
     if self_position_int not in path or opponent_position_int not in path:
-        path = find_path_befs(game_map, self_position_int, opponent_position_int)
+        path = find_path_befs(game_map_grid, self_position_int, opponent_position_int)
 
         if len(path) == 0:
             logging.info("no path found")
@@ -69,14 +80,8 @@ async def loop(agent: Agent):
 
 
 def find_path_befs(
-    game_map: Map, start: Position[int], end: Position[int]
+    game_map_grid: Grid, start: Position[int], end: Position[int]
 ) -> List[Position[int]]:
-    game_map_matrix = [
-        [1 for _ in range(game_map.length)] for _ in range(game_map.length)
-    ]
-    for obstacle in game_map.obstacles:
-        game_map_matrix[obstacle.x][obstacle.y] = 0
-    game_map_grid = Grid(matrix=game_map_matrix)
     start_node = game_map_grid.node(start.x, start.y)
     end_node = game_map_grid.node(end.x, end.y)
     finder = BestFirst()
