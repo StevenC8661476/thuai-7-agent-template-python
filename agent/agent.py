@@ -10,7 +10,7 @@ from .safe_zone import SafeZone
 from .supply import Supply
 from .websocket_client import WebsocketClient
 
-type MedicineKind = Literal[
+MedicineKind = Literal[
     "BANDAGE",
     "FIRST_AID",
 ]

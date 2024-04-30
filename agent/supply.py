@@ -2,7 +2,7 @@ from typing import Literal
 
 from .position import Position
 
-type SupplyKind = Literal[
+SupplyKind = Literal[
     "PRIMARY_ARMOR",
     "PREMIUM_ARMOR",
     "S686",

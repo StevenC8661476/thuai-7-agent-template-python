@@ -6,7 +6,7 @@ Python agent template for the 7th Tsinghua University Artificial Intelligence Ch
 
 ### Prerequisites
 
-- Python 3.12
+- Python 3.11
 
 ### Install Dependencies
 

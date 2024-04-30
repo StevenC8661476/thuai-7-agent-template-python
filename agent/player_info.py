@@ -2,20 +2,20 @@ from typing import List, Literal
 
 from .position import Position
 
-type ArmorKind = Literal[
+ArmorKind = Literal[
     "NO_ARMOR",
     "PRIMARY_ARMOR",
     "PREMIUM_ARMOR",
 ]
 
-type FirearmKind = Literal[
+FirearmKind = Literal[
     "S686",
     "M16",
     "AWM",
     "VECTOR",
 ]
 
-type ItemKind = Literal[
+ItemKind = Literal[
     "BANDAGE",
     "FIRST_AID",
     "BULLET",
