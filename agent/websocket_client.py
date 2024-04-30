@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import queue
-import time
 from typing import Callable, List
 
 import websockets
@@ -10,7 +9,7 @@ from . import messages
 
 
 class WebsocketClient:
-    _MESSAGE_TRANSMISSION_INTERVAL = 0.1
+    _MESSAGE_TRANSMISSION_INTERVAL = 0.01
     _MESSAGE_QUEUE_CAPACITY = 5
 
     def __init__(self, server: str):
@@ -40,7 +39,6 @@ class WebsocketClient:
             return
 
         self._message_queue.put(message)
-        time.sleep(WebsocketClient._MESSAGE_TRANSMISSION_INTERVAL)
 
     async def stop(self) -> None:
         for task in self._task_list:

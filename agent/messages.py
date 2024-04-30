@@ -31,9 +31,7 @@ class PerformAbandonMessage(Message):
 
 
 class PerformPickUpMessage(Message):
-    def __init__(
-        self, token: str, target_supply: str, num: int, target_position: Position
-    ):
+    def __init__(self, token: str, target_supply: str, num: int):
         super().__init__()
         self.msg["messageType"] = "PERFORM_PICK_UP"
         self.msg["token"] = token

@@ -15,7 +15,7 @@ class Options:
 
 DEFAULT_SERVER = "ws://localhost:14514"
 DEFAULT_TOKEN = "1919810"
-DEFAULT_LOOP_INTERVAL = 0.3  # In seconds.
+DEFAULT_LOOP_INTERVAL = 0.1  # In seconds.
 LOGGING_FORMAT = "[%(asctime)s] [%(levelname)s] %(message)s"
 
 
