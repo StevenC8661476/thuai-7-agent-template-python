@@ -29,11 +29,20 @@ async def main():
 
     await agent.connect(options.server)
 
+    is_previous_connected = False
     is_previous_game_ready = False
     is_setup = False
 
     while True:
         await asyncio.sleep(DEFAULT_LOOP_INTERVAL)
+
+        if not agent.is_connected():
+            if is_previous_connected:
+                logging.error(f"{agent} is no longer connected")
+                is_previous_connected = False
+
+            logging.debug(f"{agent} is waiting for the connection")
+            continue
 
         if not agent.is_game_ready():
             if is_previous_game_ready:

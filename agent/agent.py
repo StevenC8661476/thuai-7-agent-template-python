@@ -27,11 +27,16 @@ class Agent:
         self._safe_zone: Optional[SafeZone] = None
         self._self_id: Optional[int] = None
 
-        self._websocket_client = WebsocketClient("")
-        self._task_list: List[asyncio.Task] = []
+        self._ws_client = WebsocketClient()
+        self._loop_task: Optional[asyncio.Task] = None
+
+        self._ws_client.on_message = self._on_message
 
     def __str__(self) -> str:
         return f"Agent{{token: {self._token}}}"
+
+    def __repr__(self) -> str:
+        return str(self)
 
     @property
     def all_player_info(self) -> Optional[List[PlayerInfo]]:
@@ -58,17 +63,16 @@ class Agent:
         return self._token
 
     async def connect(self, server: str):
-        self._websocket_client = WebsocketClient(server)
-        self._websocket_client.register_message_handler(self._on_message)
-        await self._websocket_client.run()
-
-        self._task_list.append(asyncio.create_task(self._loop()))
+        await self._ws_client.connect(server)
+        self._loop_task = asyncio.create_task(self._loop())
 
     async def disconnect(self):
-        for task in self._task_list:
-            task.cancel()
+        if self._loop_task is not None:
+            self._loop_task.cancel()
+        await self._ws_client.disconnect()
 
-        await self._websocket_client.stop()
+    def is_connected(self) -> bool:
+        return self._ws_client.is_connected()
 
     def is_game_ready(self) -> bool:
         return (
@@ -79,8 +83,8 @@ class Agent:
             and self._self_id is not None
         )
 
-    def abandon(self, item_kind: ItemKind, count: int):
-        self._websocket_client.send(
+    async def abandon(self, item_kind: ItemKind, count: int):
+        await self._ws_client.send(
             messages.PerformAbandonMessage(
                 token=self._token,
                 numb=count,
@@ -88,64 +92,62 @@ class Agent:
             )
         )
 
-    def pick_up(self, item_kind: ItemKind, count: int):
-        self._websocket_client.send(
+    async def pick_up(self, item_kind: ItemKind, count: int):
+        await self._ws_client.send(
             messages.PerformPickUpMessage(
-                token=self._token,
-                target_supply=item_kind,
-                num=count
+                token=self._token, target_supply=item_kind, num=count
             )
         )
 
-    def switch_firearm(self, item_kind: FirearmKind):
-        self._websocket_client.send(
+    async def switch_firearm(self, item_kind: FirearmKind):
+        await self._ws_client.send(
             messages.PerformSwitchArmMessage(
                 token=self._token,
                 target_firearm=item_kind,
             )
         )
 
-    def use_medicine(self, item_kind: MedicineKind):
-        self._websocket_client.send(
+    async def use_medicine(self, item_kind: MedicineKind):
+        await self._ws_client.send(
             messages.PerformUseMedicineMessage(
                 token=self._token,
                 medicine_name=item_kind,
             )
         )
 
-    def use_grenade(self, position: Position[float]):
-        self._websocket_client.send(
+    async def use_grenade(self, position: Position[float]):
+        await self._ws_client.send(
             messages.PerformUseGrenadeMessage(
                 token=self._token,
                 target_position=messages.Position(x=position.x, y=position.y),
             )
         )
 
-    def move(self, position: Position[float]):
-        self._websocket_client.send(
+    async def move(self, position: Position[float]):
+        await self._ws_client.send(
             messages.PerformMoveMessage(
                 token=self._token,
                 destination=messages.Position(x=position.x, y=position.y),
             )
         )
 
-    def stop(self):
-        self._websocket_client.send(
+    async def stop(self):
+        await self._ws_client.send(
             messages.PerformStopMessage(
                 token=self._token,
             )
         )
 
-    def attack(self, position: Position[float]):
-        self._websocket_client.send(
+    async def attack(self, position: Position[float]):
+        await self._ws_client.send(
             messages.PerformAttackMessage(
                 token=self._token,
                 target_position=messages.Position(x=position.x, y=position.y),
             )
         )
 
-    def choose_origin(self, position: Position[float]):
-        self._websocket_client.send(
+    async def choose_origin(self, position: Position[float]):
+        await self._ws_client.send(
             messages.ChooseOriginMessage(
                 token=self._token,
                 origin_position=messages.Position(x=position.x, y=position.y),
@@ -153,11 +155,21 @@ class Agent:
         )
 
     async def _loop(self):
-        self._websocket_client.send(
-            messages.GetPlayerInfoMessage(
-                token=self._token,
-            )
-        )
+        while True:
+            try:
+                await asyncio.sleep(self._loop_interval)
+
+                if not self._ws_client.is_connected():
+                    continue
+
+                await self._ws_client.send(
+                    messages.GetPlayerInfoMessage(
+                        token=self._token,
+                    )
+                )
+
+            except Exception as e:
+                logging.error(f"{self} encountered an error in loop: {e}")
 
     def _on_message(self, message: messages.Message):
         try:
@@ -165,7 +177,7 @@ class Agent:
             msg_type = msg_dict["messageType"]
 
             if msg_type == "ERROR":
-                logging.error(f"error from server: {msg_dict['message']}")
+                logging.error(f"{self} got error from server: {msg_dict['message']}")
 
             elif msg_type == "PLAYERS_INFO":
                 self._all_player_info = [
@@ -222,4 +234,4 @@ class Agent:
                 self._self_id = msg_dict["playerId"]
 
         except Exception as e:
-            logging.error(f"error occurred in message handling: {e}")
+            logging.error(f"{self} failed to handle message: {e}")

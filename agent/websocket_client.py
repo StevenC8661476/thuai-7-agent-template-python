@@ -1,102 +1,100 @@
 import asyncio
 import logging
-import queue
-from typing import Callable, List
+from dataclasses import dataclass
+from typing import Callable, Optional, Tuple
 
 import websockets
 
 from . import messages
 
 
+@dataclass
+class _Connection:
+    ws_client: websockets.WebSocketClientProtocol
+    receive_task: asyncio.Task
+
+
 class WebsocketClient:
-    _MESSAGE_TRANSMISSION_INTERVAL = 0.01
-    _MESSAGE_QUEUE_CAPACITY = 5
+    def __init__(self):
+        self._connection: Optional[_Connection] = None
+        self._on_message: Callable[[messages.Message], None] = lambda _: None
 
-    def __init__(self, server: str):
-        self._connection = None
-        self._message_handler_list: List[Callable[[messages.Message], None]] = []
-        self._message_queue = queue.Queue(
-            maxsize=WebsocketClient._MESSAGE_QUEUE_CAPACITY
-        )
-        self._task_list: List[asyncio.Task] = []
-        self._url = server
+    @property
+    def on_message(self) -> Callable[[messages.Message], None]:
+        return self._on_message
 
-    def register_message_handler(
-        self, handler: Callable[[messages.Message], None]
-    ) -> None:
-        self._message_handler_list.append(handler)
+    @on_message.setter
+    def on_message(self, handler: Callable[[messages.Message], None]):
+        self._on_message = handler
 
-    async def run(self) -> None:
-        self._connection = await WebsocketClient._try_connect(self._url)
-        logging.info(f"Connected to {self._url}")
+    async def connect(self, server_address: str):
+        if self._connection is not None:
+            await self.disconnect()
 
-        self._task_list.append(asyncio.create_task(self._send_loop()))
-        self._task_list.append(asyncio.create_task(self._receive_loop()))
+        assert self._connection is None
 
-    def send(self, message: messages.Message) -> None:
-        if self._message_queue.full():
-            logging.error("Message queue is full, dropping message")
-            return
+        ws_client = await self._try_connect(server_address)
+        task = asyncio.create_task(self._receive_loop())
+        self._connection = _Connection(ws_client, task)
 
-        self._message_queue.put(message)
+    async def disconnect(self):
+        if self._connection is not None:
+            self._connection.receive_task.cancel()
+            await self._connection.ws_client.close()
+            self._connection = None
 
-    async def stop(self) -> None:
-        for task in self._task_list:
-            task.cancel()
+    def is_connected(self) -> bool:
+        return self._connection is not None
 
-        await self._connection.close()  # type: ignore
+    async def send(self, message: messages.Message):
+        if self._connection is None:
+            raise ValueError("connection is not established")
 
-    async def _receive_loop(self) -> None:
+        await self._connection.ws_client.send(message.json())
+
+    async def _receive_loop(self):
         while True:
+            await asyncio.sleep(0)
             try:
-                json_string = await self._connection.recv()  # type: ignore
-                try:
-                    message = messages.Message(str(json_string))
-                except Exception as e:
-                    logging.error(f"Failed to parse message: {e}")
+                connection = self._connection
+                if connection is None:
                     continue
 
-                handler_list = self._message_handler_list.copy()
+                try:
+                    json_string = await connection.ws_client.recv()
 
-                for handler in handler_list:
-                    handler(message)
+                except Exception as e:
+                    logging.error(f"failed to receive message: {e}")
+                    logging.info("reconnecting...")
+                    remote_address: Tuple[str, int] = (
+                        connection.ws_client.remote_address
+                    )
+                    await self.disconnect()
+                    await self.connect(f"ws://{remote_address[0]}:{remote_address[1]}")
+                    continue
 
-            except Exception as e:
-                logging.error(f"Failed to receive message: {e}")
-                logging.info("Trying to reconnect...")
-                self._connection = await WebsocketClient._try_connect(self._url)
+                try:
+                    message = messages.Message(str(json_string))
 
-    async def _send_loop(self) -> None:
-        while True:
-            try:
-                if not self._message_queue.empty():
-                    message: messages.Message = self._message_queue.get()
-                    try:
-                        json_string = message.json()
-                    except Exception as e:
-                        logging.error(f"Failed to serialize message: {e}")
-                        continue
+                except Exception as e:
+                    logging.error(f"failed to parse message from server: {e}")
+                    continue
 
-                    try:
-                        await self._connection.send(json_string)  # type: ignore
-
-                    except Exception as e:
-                        logging.error(f"Failed to send message: {e}")
-
-                await asyncio.sleep(WebsocketClient._MESSAGE_TRANSMISSION_INTERVAL)
+                self._on_message(message)
 
             except Exception as e:
-                logging.error(f"Unexpected error occured in send loop: {e}")
+                logging.error(f"encountered an error in receive loop: {e}")
 
     @staticmethod
-    async def _try_connect(url: str) -> websockets.WebSocketClientProtocol:  # type: ignore
-        logging.info(f"Trying to connect to {url}")
-
+    async def _try_connect(url: str) -> websockets.WebSocketClientProtocol:
         is_connected = False
+
         while not is_connected:
             try:
-                return await websockets.connect(url)  # type: ignore
+                return await websockets.connect(url)
 
             except Exception as e:
-                logging.error(f"Failed to connect to {url}: {e}")
-                logging.info("Retrying...")
+                logging.error(f"failed to connect to {url}: {e}")
+                logging.info("retrying...")
+
+        raise RuntimeError("unreachable")

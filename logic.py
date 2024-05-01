@@ -70,11 +70,11 @@ async def loop(agent: Agent):
             float(next_position_int.x) + 0.5, float(next_position_int.y) + 0.5
         )
 
-        agent.move(next_position)
+        await agent.move(next_position)
         logging.info(f"moving from {self_info.position} to {next_position}")
         return
 
-    agent.attack(opponent_info.position)
+    await agent.attack(opponent_info.position)
 
 
 def find_path_befs(
