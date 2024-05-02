@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import logging
+import os
 
 from agent.agent import Agent
 from logic import loop, setup
@@ -64,6 +65,9 @@ async def main():
 
 
 def parse_options() -> Options:
+    server_env = os.getenv("SERVER", default=DEFAULT_SERVER)
+    token_env = os.getenv("TOKEN", default=DEFAULT_TOKEN)
+
     parser = argparse.ArgumentParser("agent")
     parser.add_argument(
         "--logging-level",
@@ -78,10 +82,8 @@ def parse_options() -> Options:
             logging.DEBUG,
         ],
     )
-    parser.add_argument(
-        "--server", type=str, help="Server address", default=DEFAULT_SERVER
-    )
-    parser.add_argument("--token", type=str, help="Agent token", default=DEFAULT_TOKEN)
+    parser.add_argument("--server", type=str, help="Server address", default=server_env)
+    parser.add_argument("--token", type=str, help="Agent token", default=token_env)
     args = parser.parse_args()
     return Options(
         logging_level=args.logging_level, server=args.server, token=args.token
