@@ -7,6 +7,8 @@ import websockets
 
 from . import messages
 
+RECONNECT_INTERVAL = 3.0
+
 
 @dataclass
 class _Connection:
@@ -64,7 +66,7 @@ class WebsocketClient:
                     json_string = await connection.ws_client.recv()
 
                 except Exception as e:
-                    logging.error(f"failed to receive message: {e}")
+                    logging.error(f"failed to receive message from server: {e}")
                     logging.info("reconnecting...")
                     remote_address: Tuple[str, int] = (
                         connection.ws_client.remote_address
@@ -95,6 +97,7 @@ class WebsocketClient:
 
             except Exception as e:
                 logging.error(f"failed to connect to {url}: {e}")
+                await asyncio.sleep(RECONNECT_INTERVAL)
                 logging.info("retrying...")
 
         raise RuntimeError("unreachable")

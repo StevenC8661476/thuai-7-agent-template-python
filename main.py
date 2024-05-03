@@ -14,6 +14,7 @@ class Options:
         self.token = token
 
 
+DEFAULT_LOGGING_LEVEL = logging.INFO
 DEFAULT_SERVER = "ws://localhost:14514"
 DEFAULT_TOKEN = "1919810"
 DEFAULT_LOOP_INTERVAL = 0.1  # In seconds.
@@ -39,11 +40,15 @@ async def main():
 
         if not agent.is_connected():
             if is_previous_connected:
-                logging.error(f"{agent} is no longer connected")
+                logging.error(f"{agent} is disconnected")
                 is_previous_connected = False
 
             logging.debug(f"{agent} is waiting for the connection")
             continue
+
+        if not is_previous_connected:
+            logging.info(f"{agent} is connected")
+            is_previous_connected = True
 
         if not agent.is_game_ready():
             if is_previous_game_ready:
@@ -53,12 +58,12 @@ async def main():
             logging.debug(f"{agent} is waiting for the game to be ready")
             continue
         if not is_previous_game_ready:
-            logging.info(f"{agent} is now in a ready game")
+            logging.info(f"{agent} is in a ready game")
             is_previous_game_ready = True
 
         if not is_setup:
             await setup(agent)
-            logging.info(f"{agent} is now set up")
+            logging.info(f"{agent} is set up")
             is_setup = True
 
         await loop(agent)
@@ -73,7 +78,7 @@ def parse_options() -> Options:
         "--logging-level",
         type=int,
         help="Logging level",
-        default=logging.INFO,
+        default=DEFAULT_LOGGING_LEVEL,
         choices=[
             logging.CRITICAL,
             logging.ERROR,

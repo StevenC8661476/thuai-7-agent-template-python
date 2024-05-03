@@ -56,10 +56,12 @@ async def loop(agent: Agent):
         path = find_path_befs(game_map_matrix, self_position_int, opponent_position_int)
 
         if len(path) == 0:
-            logging.info("no path found")
+            logging.info(
+                "no path found from %s to %s", self_position_int, opponent_position_int
+            )
             return
 
-        logging.info(f"path: {path}")
+        logging.info(f"path from {self_position_int} to {opponent_position_int}")
 
     while path[0] != self_position_int:
         path.pop(0)
