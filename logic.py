@@ -41,7 +41,7 @@ async def loop(agent: Agent):
             [1 for _ in range(game_map.length)] for _ in range(game_map.length)
         ]
         for obstacle in game_map.obstacles:
-            game_map_matrix[obstacle.x][obstacle.y] = 0
+            game_map_matrix[obstacle.y][obstacle.x] = 0
 
     self_position_int = Position[int](
         int(self_info.position.x), int(self_info.position.y)
