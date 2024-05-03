@@ -71,8 +71,11 @@ class WebsocketClient:
                     remote_address: Tuple[str, int] = (
                         connection.ws_client.remote_address
                     )
-                    await self.disconnect()
-                    await self.connect(f"ws://{remote_address[0]}:{remote_address[1]}")
+                    await connection.ws_client.close()
+                    connection.ws_client = await self._try_connect(
+                        f"ws://{remote_address[0]}:{remote_address[1]}"
+                    )
+                    self._connection = connection
                     continue
 
                 try:
