@@ -84,6 +84,7 @@ class Agent:
         )
 
     async def abandon(self, item_kind: ItemKind, count: int):
+        logging.debug("%s.abandon(%s, %d)", self, item_kind, count)
         await self._ws_client.send(
             messages.PerformAbandonMessage(
                 token=self._token,
@@ -93,6 +94,7 @@ class Agent:
         )
 
     async def pick_up(self, item_kind: ItemKind, count: int):
+        logging.debug("%s.pick_up(%s, %d)", self, item_kind, count)
         await self._ws_client.send(
             messages.PerformPickUpMessage(
                 token=self._token, target_supply=item_kind, num=count
@@ -100,6 +102,7 @@ class Agent:
         )
 
     async def switch_firearm(self, item_kind: FirearmKind):
+        logging.debug("%s.switch_firearm(%s)", self, item_kind)
         await self._ws_client.send(
             messages.PerformSwitchArmMessage(
                 token=self._token,
@@ -108,6 +111,7 @@ class Agent:
         )
 
     async def use_medicine(self, item_kind: MedicineKind):
+        logging.debug("%s.use_medicine(%s)", self, item_kind)
         await self._ws_client.send(
             messages.PerformUseMedicineMessage(
                 token=self._token,
@@ -116,6 +120,7 @@ class Agent:
         )
 
     async def use_grenade(self, position: Position[float]):
+        logging.debug("%s.use_grenade(%s)", self, position)
         await self._ws_client.send(
             messages.PerformUseGrenadeMessage(
                 token=self._token,
@@ -124,6 +129,7 @@ class Agent:
         )
 
     async def move(self, position: Position[float]):
+        logging.debug("%s.move(%s)", self, position)
         await self._ws_client.send(
             messages.PerformMoveMessage(
                 token=self._token,
@@ -132,6 +138,7 @@ class Agent:
         )
 
     async def stop(self):
+        logging.debug("%s.stop()", self)
         await self._ws_client.send(
             messages.PerformStopMessage(
                 token=self._token,
@@ -139,6 +146,7 @@ class Agent:
         )
 
     async def attack(self, position: Position[float]):
+        logging.debug("%s.attack(%s)", self, position)
         await self._ws_client.send(
             messages.PerformAttackMessage(
                 token=self._token,
@@ -147,6 +155,7 @@ class Agent:
         )
 
     async def choose_origin(self, position: Position[float]):
+        logging.debug("%s.choose_origin(%s)", self, position)
         await self._ws_client.send(
             messages.ChooseOriginMessage(
                 token=self._token,
