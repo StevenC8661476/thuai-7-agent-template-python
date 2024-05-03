@@ -49,10 +49,14 @@ class WebsocketClient:
         return self._connection is not None
 
     async def send(self, message: messages.Message):
-        if self._connection is None:
-            raise ValueError("connection is not established")
+        try:
+            if self._connection is None:
+                raise ValueError("connection is not established")
 
-        await self._connection.ws_client.send(message.json())
+            await self._connection.ws_client.send(message.json())
+        
+        except Exception as e:
+            logging.error("failed to send message to server: %s", e)
 
     async def _receive_loop(self):
         while True:
