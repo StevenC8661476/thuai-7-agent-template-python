@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 RUN pip install --disable-pip-version-check --no-cache-dir -r requirements.txt
 
-FROM gcr.io/distroless/python3-debian12
+FROM gcr.nju.edu.cn/distroless/python3-debian12
 WORKDIR /app
 COPY --from=build-env /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=build-env /app .
