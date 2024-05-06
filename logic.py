@@ -41,7 +41,7 @@ async def loop(agent: Agent):
             [1 for _ in range(game_map.length)] for _ in range(game_map.length)
         ]
         for obstacle in game_map.obstacles:
-            game_map_matrix[obstacle.x][obstacle.y] = 0
+            game_map_matrix[obstacle.y][obstacle.x] = 0
 
     self_position_int = Position[int](
         int(self_info.position.x), int(self_info.position.y)
@@ -57,11 +57,11 @@ async def loop(agent: Agent):
 
         if len(path) == 0:
             logging.info(
-                "no path found from %s to %s", self_position_int, opponent_position_int
+                "no path from %s to %s", self_position_int, opponent_position_int
             )
             return
 
-        logging.info(f"path from {self_position_int} to {opponent_position_int}")
+        logging.info(f"found path from {self_position_int} to {opponent_position_int}")
 
     while path[0] != self_position_int:
         path.pop(0)
@@ -73,7 +73,6 @@ async def loop(agent: Agent):
         )
 
         await agent.move(next_position)
-        logging.info(f"moving from {self_info.position} to {next_position}")
         return
 
     await agent.attack(opponent_info.position)
