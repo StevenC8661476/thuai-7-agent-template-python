@@ -83,39 +83,39 @@ class Agent:
             and self._self_id is not None
         )
 
-    async def abandon(self, item_kind: SupplyKind, count: int):
-        logging.debug("%s.abandon(%s, %d)", self, item_kind, count)
+    async def abandon(self, supply: SupplyKind, count: int):
+        logging.debug("%s.abandon(%s, %d)", self, supply, count)
         await self._ws_client.send(
             messages.PerformAbandonMessage(
                 token=self._token,
                 numb=count,
-                target_supply=item_kind,
+                target_supply=supply,
             )
         )
 
-    async def pick_up(self, item_kind: SupplyKind, count: int):
-        logging.debug("%s.pick_up(%s, %d)", self, item_kind, count)
+    async def pick_up(self, supply: SupplyKind, count: int):
+        logging.debug("%s.pick_up(%s, %d)", self, supply, count)
         await self._ws_client.send(
             messages.PerformPickUpMessage(
-                token=self._token, target_supply=item_kind, num=count
+                token=self._token, target_supply=supply, num=count
             )
         )
 
-    async def switch_firearm(self, item_kind: FirearmKind):
-        logging.debug("%s.switch_firearm(%s)", self, item_kind)
+    async def switch_firearm(self, firearm: FirearmKind):
+        logging.debug("%s.switch_firearm(%s)", self, firearm)
         await self._ws_client.send(
             messages.PerformSwitchArmMessage(
                 token=self._token,
-                target_firearm=item_kind,
+                target_firearm=firearm,
             )
         )
 
-    async def use_medicine(self, item_kind: MedicineKind):
-        logging.debug("%s.use_medicine(%s)", self, item_kind)
+    async def use_medicine(self, medicine: MedicineKind):
+        logging.debug("%s.use_medicine(%s)", self, medicine)
         await self._ws_client.send(
             messages.PerformUseMedicineMessage(
                 token=self._token,
-                medicine_name=item_kind,
+                medicine_name=medicine,
             )
         )
 
