@@ -193,9 +193,12 @@ class Agent:
                     PlayerInfo(
                         id=data["playerId"],
                         armor=data["armor"],
+                        current_armor_health=data["current_armor_health"],
                         health=data["health"],
                         speed=data["speed"],
                         firearm=data["firearm"]["name"],
+                        firearms_pool=[data["firearm"]["name"]
+                                       for data in data["firearms_pool"]],
                         range=data["firearm"]["distance"],
                         position=Position(
                             x=data["position"]["x"], y=data["position"]["y"]
