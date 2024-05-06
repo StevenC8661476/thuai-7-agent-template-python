@@ -7,7 +7,7 @@ from .map import Map
 from .player_info import FirearmKind, Item, ItemKind, PlayerInfo
 from .position import Position
 from .safe_zone import SafeZone
-from .supply import Supply
+from .supply import Supply, SupplyKind
 from .websocket_client import WebsocketClient
 
 MedicineKind = Literal[
@@ -83,7 +83,7 @@ class Agent:
             and self._self_id is not None
         )
 
-    async def abandon(self, item_kind: ItemKind, count: int):
+    async def abandon(self, item_kind: SupplyKind, count: int):
         logging.debug("%s.abandon(%s, %d)", self, item_kind, count)
         await self._ws_client.send(
             messages.PerformAbandonMessage(
@@ -93,7 +93,7 @@ class Agent:
             )
         )
 
-    async def pick_up(self, item_kind: ItemKind, count: int):
+    async def pick_up(self, item_kind: SupplyKind, count: int):
         logging.debug("%s.pick_up(%s, %d)", self, item_kind, count)
         await self._ws_client.send(
             messages.PerformPickUpMessage(
