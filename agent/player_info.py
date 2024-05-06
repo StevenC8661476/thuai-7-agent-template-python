@@ -9,6 +9,7 @@ ArmorKind = Literal[
 ]
 
 FirearmKind = Literal[
+    "FIST",
     "S686",
     "M16",
     "AWM",
