@@ -9,6 +9,7 @@ ArmorKind = Literal[
 ]
 
 FirearmKind = Literal[
+    "FIST",
     "S686",
     "M16",
     "AWM",
@@ -34,21 +35,25 @@ class PlayerInfo:
         self,
         id: int,
         armor: ArmorKind,
+        current_armor_health: float,
         health: int,
         speed: float,
         firearm: FirearmKind,
+        firearms_pool: List[FirearmKind],
         range: float,
         position: Position[float],
         inventory: List[Item],
     ):
         self.id = id
         self.armor = armor
+        self.current_armor_health = current_armor_health
         self.health = health
         self.speed = speed
         self.firearm = firearm
+        self.firearms_pool = firearms_pool
         self.range = range
         self.position = position
         self.inventory = inventory
 
     def __str__(self) -> str:
-        return f"PlayerInfo{{id: {self.id}, armor: {self.armor}, health: {self.health}, speed: {self.speed}, firearm: {self.firearm}, range: {self.range}, position: {self.position}, inventory: {self.inventory}}}"
+        return f"PlayerInfo{{id: {self.id}, armor: {self.armor}, current_armor_health:{self.current_armor_health}, health: {self.health}, speed: {self.speed}, firearm: {self.firearm}, firearms_pool:{self.firearms_pool}, range: {self.range}, position: {self.position}, inventory: {self.inventory}}}"
