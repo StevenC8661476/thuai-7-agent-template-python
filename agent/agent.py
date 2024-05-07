@@ -26,6 +26,7 @@ class Agent:
         self._supplies: Optional[List[Supply]] = None
         self._safe_zone: Optional[SafeZone] = None
         self._self_id: Optional[int] = None
+        self._ticks: Optional[int] = None
 
         self._ws_client = WebsocketClient()
         self._loop_task: Optional[asyncio.Task] = None
@@ -245,6 +246,9 @@ class Agent:
 
             elif msg_type == "PLAYER_ID":
                 self._self_id = msg_dict["playerId"]
+
+            elif msg_type == "TICKS":
+                self._ticks = msg_dict["elapsedTicks"]
 
         except Exception as e:
             logging.error(f"{self} failed to handle message: {e}")
