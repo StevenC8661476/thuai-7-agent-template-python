@@ -46,9 +46,11 @@ class PlayerInfo:
     ):
         self.id = id
         self.armor = armor
+        self.current_armor_health = current_armor_health
         self.health = health
         self.speed = speed
         self.firearm = firearm
+        self.firearms_pool = firearms_pool
         self.range = range
         self.position = position
         self.inventory = inventory
