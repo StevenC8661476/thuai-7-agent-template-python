@@ -62,6 +62,10 @@ class Agent:
     @property
     def token(self) -> str:
         return self._token
+    
+    @property
+    def ticks(self) -> Optional[int]:
+        return self._ticks
 
     async def connect(self, server: str):
         await self._ws_client.connect(server)
