@@ -62,7 +62,7 @@ class Agent:
     @property
     def token(self) -> str:
         return self._token
-    
+
     @property
     def ticks(self) -> Optional[int]:
         return self._ticks
