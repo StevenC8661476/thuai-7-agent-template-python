@@ -194,6 +194,7 @@ class Agent:
                 logging.error(f"{self} got error from server: {msg_dict['message']}")
 
             elif msg_type == "PLAYERS_INFO":
+                self._ticks = msg_dict["elapsedTicks"]
                 self._all_player_info = [
                     PlayerInfo(
                         id=data["playerId"],
@@ -250,9 +251,6 @@ class Agent:
 
             elif msg_type == "PLAYER_ID":
                 self._self_id = msg_dict["playerId"]
-
-            elif msg_type == "TICKS":
-                self._ticks = msg_dict["elapsedTicks"]
 
         except Exception as e:
             logging.error(f"{self} failed to handle message: {e}")
