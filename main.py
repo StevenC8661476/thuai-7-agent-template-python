@@ -17,7 +17,7 @@ class Options:
 DEFAULT_LOGGING_LEVEL = logging.INFO
 DEFAULT_SERVER_ADDRESS = "ws://localhost:14514"
 DEFAULT_TOKEN = "1919810"
-DEFAULT_LOOP_INTERVAL = 0.1  # In seconds.
+DEFAULT_LOOP_INTERVAL = 0.2  # In seconds.
 LOGGING_FORMAT = "[%(asctime)s] [%(levelname)s] %(message)s"
 
 
