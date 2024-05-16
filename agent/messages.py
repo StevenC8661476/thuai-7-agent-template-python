@@ -106,3 +106,10 @@ class ChooseOriginMessage(Message):
         self.msg["messageType"] = "CHOOSE_ORIGIN"
         self.msg["token"] = token
         self.msg["originPosition"] = {"x": origin_position.x, "y": origin_position.y}
+
+
+class GrenadeMessage(Message):
+    def __init__(self, token: str):
+        super().__init__()
+        self.msg["messageType"] = "GRENADE_MESSAGE"
+        self.msg["token"] = token

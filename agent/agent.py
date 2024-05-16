@@ -3,6 +3,7 @@ import logging
 from typing import List, Literal, Optional
 
 from . import messages
+from .grenade_info import GrenadeInfo
 from .map import Map
 from .player_info import FirearmKind, Item, ItemKind, PlayerInfo
 from .position import Position
@@ -25,6 +26,7 @@ class Agent:
         self._map: Optional[Map] = None
         self._supplies: Optional[List[Supply]] = None
         self._safe_zone: Optional[SafeZone] = None
+        self._grenade_info: Optional[List[GrenadeInfo]] = None
         self._self_id: Optional[int] = None
         self._ticks: Optional[int] = None
 
@@ -66,6 +68,10 @@ class Agent:
     @property
     def ticks(self) -> Optional[int]:
         return self._ticks
+
+    @property
+    def grenade_info(self) -> Optional[List[GrenadeInfo]]:
+        return self._grenade_info
 
     async def connect(self, server: str):
         await self._ws_client.connect(server)
@@ -251,6 +257,18 @@ class Agent:
 
             elif msg_type == "PLAYER_ID":
                 self._self_id = msg_dict["playerId"]
+
+            elif msg_type == "GRENADES":
+                self._grenade_info = [
+                    GrenadeInfo(
+                        throwTick=grenade["throwTick"],
+                        evaluatedPosition=Position(
+                            x=grenade["evaluatedPosition"]["x"],
+                            y=grenade["evaluatedPosition"]["y"],
+                        ),
+                    )
+                    for grenade in msg_dict["grenades"]
+                ]
 
         except Exception as e:
             logging.error(f"{self} failed to handle message: {e}")
