@@ -3,7 +3,7 @@ import logging
 from typing import List, Literal, Optional
 
 from . import messages
-from .messages import GrenadeInfo
+from .grenade_info import GrenadeInfo
 from .map import Map
 from .player_info import FirearmKind, Item, ItemKind, PlayerInfo
 from .position import Position

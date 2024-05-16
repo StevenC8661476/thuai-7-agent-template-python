@@ -113,16 +113,3 @@ class GrenadeMessage(Message):
         super().__init__()
         self.msg["messageType"] = "GRENADE_MESSAGE"
         self.msg["token"] = token
-
-
-class GrenadeInfo:
-    def __init__(
-        self,
-        throwTick: int,
-        evaluatedPosition: Position,
-    ):
-        self.throwTick = throwTick
-        self.evaluatedPosition = evaluatedPosition
-
-    def __str__(self) -> str:
-        return f"GrenadeInfo{{throwTick: {self.throwTick}, evaluatedPosition: {self.evaluatedPosition}}}"
