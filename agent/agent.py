@@ -86,13 +86,7 @@ class Agent:
         return self._ws_client.is_connected()
 
     def is_game_ready(self) -> bool:
-        return (
-            self._all_player_info is not None
-            and self._map is not None
-            and self._supplies is not None
-            and self._safe_zone is not None
-            and self._self_id is not None
-        )
+        return self._ticks is not None
 
     async def abandon(self, supply: SupplyKind, count: int):
         logging.debug("%s.abandon(%s, %d)", self, supply, count)
