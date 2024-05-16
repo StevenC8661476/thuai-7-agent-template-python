@@ -68,7 +68,7 @@ class Agent:
     @property
     def ticks(self) -> Optional[int]:
         return self._ticks
-    
+
     @property
     def grenade_info(self) -> Optional[List[GrenadeInfo]]:
         return self._grenade_info
@@ -257,13 +257,14 @@ class Agent:
 
             elif msg_type == "PLAYER_ID":
                 self._self_id = msg_dict["playerId"]
-            
+
             elif msg_type == "GRENADES":
                 self._grenade_info = [
                     GrenadeInfo(
                         throwTick=grenade["throwTick"],
                         evaluatedPosition=Position(
-                            x=grenade["evaluatedPosition"]["x"],y=grenade["evaluatedPosition"]["y"]
+                            x=grenade["evaluatedPosition"]["x"],
+                            y=grenade["evaluatedPosition"]["y"],
                         ),
                     )
                     for grenade in msg_dict["grenades"]
