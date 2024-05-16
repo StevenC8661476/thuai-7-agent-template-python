@@ -54,6 +54,7 @@ class WebsocketClient:
                 raise ValueError("connection is not established")
 
             await self._connection.ws_client.send(message.json())
+            await asyncio.sleep(0.01) # Avoid flood to disconnect.
 
         except Exception as e:
             logging.error("failed to send message to server: %s", e)
