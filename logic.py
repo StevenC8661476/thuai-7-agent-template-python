@@ -29,7 +29,7 @@ async def loop(agent: Agent):
     assert self_id is not None
 
     self_info = player_info_list[self_id]
-    opponent_info = player_info_list[1 - self_id]
+    opponent_info = player_info_list[(self_id + 1) % len(player_info_list)]
 
     game_map = agent.map
     assert game_map is not None
